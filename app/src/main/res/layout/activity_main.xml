@@ -62,12 +62,47 @@
 
     </com.google.android.material.tabs.TabLayout>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:layout_width="409dp"
-        android:layout_height="595dp"
-        android:layout_marginTop="1dp"
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="218dp"
+        android:layout_height="77dp"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="sans-serif-light"
+        android:text="Отправить"
+        android:textColor="#DFDFDF"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ScrollView
+        android:layout_width="400dp"
+        android:layout_height="408dp"
+        android:layout_marginBottom="96dp"
+        app:layout_constraintBottom_toTopOf="@+id/button3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <EditText
+        android:id="@+id/editTextTextMultiLine"
+        android:layout_width="312dp"
+        android:layout_height="86dp"
+        android:layout_marginBottom="12dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="Запрос"
+        android:inputType="textMultiLine"
+        android:textAlignment="center"
+        android:textColor="#FFEBEE"
+        app:layout_constraintBottom_toTopOf="@+id/button3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.518"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
