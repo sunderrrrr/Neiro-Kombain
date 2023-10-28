@@ -4,6 +4,7 @@ package com.example.neirocombain
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Html
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -31,29 +32,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         etQuestion=findViewById(R.id.request)
+
         val btnSubmit=findViewById<Button>(R.id.sumbit)
         idTVQuestion=findViewById<TextView>(R.id.quest)
         txtResponse=findViewById<TextView>(R.id.result)
-
-
-        /** btnSubmit.setOnClickListener {
-        val question=etQuestion.text.toString().trim()
-        Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
-        if(question.isNotEmpty()){
-        getResponse(question) { response ->
-        runOnUiThread {
-        txtResponse.text = response
-        }
-        }
-        }
-        } */
-
+        txtResponse.movementMethod = ScrollingMovementMethod()
 
         btnSubmit.setOnClickListener {
 
 
                 // setting response tv on below line.
-                txtResponse.text = "Подождите.."
+                txtResponse.text = "Печатает..."
 
                 // validating text
                 edittextval = etQuestion.text.toString().trim()
@@ -62,7 +51,12 @@ class MainActivity : AppCompatActivity() {
                 if(question.isNotEmpty()){
                     getResponse(question) { response ->
                         runOnUiThread {
-                            txtResponse.text = response
+
+                            for (i in 0 until response.length) {
+                                txtResponse.append(response[i].toString())
+                                
+                            }
+                           // txtResponse.text = response
                         }
                     }
                 }
@@ -112,28 +106,12 @@ class MainActivity : AppCompatActivity() {
                 }
                 val jsonObject= JSONObject(body)
                 val jsonArray=jsonObject.getJSONArray("choices")
-
                 println("JSON ARRAY: $jsonArray")
-
-
-                //val message = jsonArray[0]
-                //println(message.toString())
-
                 var test = jsonArray.getJSONObject(0)
-
                 println("TEST $test")
                 val message = test.getJSONObject("message")
                 callback(message.getString("content").toString())
 
-
-
-
-                //println(test)
-                //val textResult=jsonArray.getJSONObject(0).getString("content")
-
-               // println(textResult)
-                //callback(message.toString())
-               // callback(textResult.getString("content").toString())
             }
         })
     }
