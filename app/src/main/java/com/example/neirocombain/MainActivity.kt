@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Html
 import android.util.Log
 import android.view.inputmethod.EditorInfo
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -29,9 +30,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         etQuestion=findViewById(R.id.request)
-        //val btnSubmit=findViewById<Button>(R.id.btnSubmit)
+        val btnSubmit=findViewById<Button>(R.id.sumbit)
         idTVQuestion=findViewById<TextView>(R.id.quest)
         txtResponse=findViewById<TextView>(R.id.result)
+
 
         /** btnSubmit.setOnClickListener {
         val question=etQuestion.text.toString().trim()
@@ -46,8 +48,8 @@ class MainActivity : AppCompatActivity() {
         } */
 
 
-        etQuestion.setOnEditorActionListener(TextView.OnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_SEND) {
+        btnSubmit.setOnClickListener {
+
 
                 // setting response tv on below line.
                 txtResponse.text = "Подождите.."
@@ -62,17 +64,17 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-                return@OnEditorActionListener true
-            }
-            false
-        })
+
+
+
+        }
 
 
     }
     fun getResponse(question: String, callback: (String) -> Unit){
 
         // setting text on for question on below line.
-        idTVQuestion.text = question
+        idTVQuestion.text = "Ваш запрос: $question"
         etQuestion.setText("")
 
         val apiKey="sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
@@ -108,9 +110,28 @@ class MainActivity : AppCompatActivity() {
                 }
                 val jsonObject= JSONObject(body)
                 val jsonArray=jsonObject.getJSONArray("choices")
-                val textResult=jsonArray.getJSONObject(0)
 
-                callback(textResult.getString("content"))
+                println("JSON ARRAY: $jsonArray")
+
+
+                //val message = jsonArray[0]
+                //println(message.toString())
+
+                var test = jsonArray.getJSONObject(0)
+
+                println("TEST $test")
+                val message = test.getJSONObject("message")
+                callback(message.getString("content").toString())
+
+
+
+
+                //println(test)
+                //val textResult=jsonArray.getJSONObject(0).getString("content")
+
+               // println(textResult)
+                //callback(message.toString())
+               // callback(textResult.getString("content").toString())
             }
         })
     }
