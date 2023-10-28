@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var txtResponse: TextView
     lateinit var idTVQuestion: TextView
     lateinit var etQuestion: EditText
+    lateinit var edittextval: String
     override fun onCreate(savedInstanceState: Bundle?) {
         //  val title = findViewById<TextView>(R.id.title)
         //val text = "<font color=#6314F4>Neiro</font><font color=#FFFFFF>.Combain</font>"
@@ -55,8 +56,9 @@ class MainActivity : AppCompatActivity() {
                 txtResponse.text = "Подождите.."
 
                 // validating text
-                val question = etQuestion.text.toString().trim()
-                Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
+                edittextval = etQuestion.text.toString().trim()
+                val question = edittextval.replace(" ","")
+                //Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
                 if(question.isNotEmpty()){
                     getResponse(question) { response ->
                         runOnUiThread {
@@ -74,8 +76,8 @@ class MainActivity : AppCompatActivity() {
     fun getResponse(question: String, callback: (String) -> Unit){
 
         // setting text on for question on below line.
-        idTVQuestion.text = "Ваш запрос: $question"
-        etQuestion.setText("")
+        idTVQuestion.text = "Ваш запрос: $edittextval"
+        //etQuestion.setText("")
 
         val apiKey="sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
         val url="https://api.proxyapi.ru/openai/v1/chat/completions"
@@ -84,7 +86,7 @@ class MainActivity : AppCompatActivity() {
             {
             "model": "gpt-3.5-turbo",
             "messages": [{"role": "user", "content": "$question"}],
-            "temperature": 0.7
+            "temperature": 0.0
             }
         """.trimIndent()
 

@@ -43,7 +43,7 @@
         android:id="@+id/tabLayout"
         android:layout_width="270dp"
         android:layout_height="63dp"
-        android:layout_marginBottom="570dp"
+        android:layout_marginBottom="550dp"
         android:background="#2B2B2B"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,6 +67,7 @@
         android:id="@+id/sumbit"
         android:layout_width="242dp"
         android:layout_height="60dp"
+        android:layout_marginTop="655dp"
         android:layout_marginBottom="16dp"
         android:fontFamily="sans-serif-light"
         android:text="Отправить"
@@ -74,25 +75,29 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/request"
         android:layout_width="311dp"
         android:layout_height="76dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="12dp"
-        android:ems="10"
+        android:layout_marginStart="52dp"
 
+        android:layout_marginTop="591dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="80dp"
+        android:ems="10"
         android:hint="Запрос"
         android:inputType="textMultiLine"
         android:textAlignment="textStart"
         android:textColor="#FFEBEE"
-        app:layout_constraintBottom_toTopOf="@+id/sumbit"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.518"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.75" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -100,6 +105,7 @@
         android:layout_height="458dp"
         android:layout_marginStart="5dp"
         android:orientation="vertical"
+        android:verticalScrollbarPosition="right"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.451"
@@ -118,10 +124,14 @@
         <TextView
             android:id="@+id/result"
             android:layout_width="match_parent"
-            android:layout_height="407dp"
+            android:layout_height="match_parent"
+            android:scrollIndicators="right"
+            android:scrollbars="vertical"
             android:scrollHorizontally="false"
             android:text="Результат:"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:verticalScrollbarPosition="right" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
