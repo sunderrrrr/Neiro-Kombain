@@ -1,21 +1,23 @@
 package com.example.neirocombain
 
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Html
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import com.google.android.material.textfield.TextInputEditText
-import okhttp3.*
+import androidx.appcompat.app.AppCompatActivity
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -33,58 +35,41 @@ class MainActivity : AppCompatActivity() {
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
     override fun onCreate(savedInstanceState: Bundle?) {
-        //  val title = findViewById<TextView>(R.id.title)
-        //val text = "<font color=#6314F4>Neiro</font><font color=#FFFFFF>.Combain</font>"
-        //title.text = Html.fromHtml(text)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         etQuestion=findViewById(R.id.request)
-
+        val load = findViewById<ProgressBar>(R.id.load)
         val btnSubmit=findViewById<Button>(R.id.sumbit)
         //idTVQuestion=findViewById<TextView>(R.id.quest)
         txtResponse=findViewById<TextView>(R.id.result)
         txtResponse.movementMethod = ScrollingMovementMethod()
 
         btnSubmit.setOnClickListener {
-
-
-                // setting response tv on below line.
-
-
-
-                // validating text
                 edittextval = etQuestion.text.toString().trim()
-                txtResponse.text = "Вы: $edittextval\n"
                 println(edittextval)
                 val question = edittextval.replace(" ","")
-                val stringBuilder = StringBuilder()
                 //Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
-                if(question.isNotEmpty()){
+                if(question.isNotEmpty() && question.length>=3){
+                    txtResponse.text = ""
+                    load.visibility = View.VISIBLE//Отправляем строку в функцию
                     getResponse(question) { response ->
                         runOnUiThread {
+                            load.visibility = View.GONE
                             txtResponse.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
-                            txtResponse.text = txtResponse.text.toString() +"\nChatGPT: $response\n"
-                            /*Thread{
-                                for (letter in response){
-                                    stringBuilder.append(letter)
-                                    Thread.sleep(25)
-                                    runOnUiThread{
+                            txtResponse.text = "Вы: $edittextval.capitalize()\n \nChatGPT: $response\n"
 
-                                    }
-                                }
-                            }.start()*/
-                           // txtResponse.text = response
                         }
                     }
                 }
+                else{
+                    load.visibility = View.GONE
+                    Toast.makeText(applicationContext, "Вы не ввели запрос или он слишком короткий!", Toast.LENGTH_SHORT).show()
+
+                }
         }
     }
-    fun getResponse(question: String, callback: (String) -> Unit){
-
-        // setting text on for question on below line.
-       // idTVQuestion.text = "Ваш запрос: $edittextval"
-        //etQuestion.setText("")
-
+    fun getResponse(question: String, callback: (String) -> Unit){ //Отправляем запрос
         val apiKey="sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
         val url="https://api.proxyapi.ru/openai/v1/chat/completions"
 
