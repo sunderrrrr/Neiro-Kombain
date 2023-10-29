@@ -103,13 +103,8 @@
             android:fontFamily="sans-serif-light"
             android:text="Запрос:"
             android:textAlignment="center"
-            android:textSize="20sp" />
-
-        <View
-            android:id="@+id/divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider" />
+            android:textSize="20sp"
+            android:visibility="invisible" />
 
         <TextView
             android:id="@+id/result"
@@ -118,6 +113,7 @@
 
             android:fontFamily="sans-serif-light"
             android:overScrollMode="always"
+            android:paddingTop="5sp"
             android:scrollIndicators="right"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:scrollbars="vertical"

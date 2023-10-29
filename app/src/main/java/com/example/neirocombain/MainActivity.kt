@@ -49,10 +49,11 @@ class MainActivity : AppCompatActivity() {
 
                 // setting response tv on below line.
 
-                txtResponse.text = "ChatGPT: Печатает..."
+
 
                 // validating text
                 edittextval = etQuestion.text.toString().trim()
+                txtResponse.text = "Вы: $edittextval\n"
                 println(edittextval)
                 val question = edittextval.replace(" ","")
                 val stringBuilder = StringBuilder()
@@ -60,16 +61,16 @@ class MainActivity : AppCompatActivity() {
                 if(question.isNotEmpty()){
                     getResponse(question) { response ->
                         runOnUiThread {
-
-                            Thread{
+                            txtResponse.text = txtResponse.text.toString() +"\nChatGPT: $response\n"
+                            /*Thread{
                                 for (letter in response){
                                     stringBuilder.append(letter)
                                     Thread.sleep(25)
                                     runOnUiThread{
-                                        txtResponse.text = stringBuilder.toString()
+
                                     }
                                 }
-                            }.start()
+                            }.start()*/
                            // txtResponse.text = response
                         }
                     }
