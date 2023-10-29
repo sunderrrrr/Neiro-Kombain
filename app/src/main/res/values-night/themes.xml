@@ -2,6 +2,6 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.NeiroCombain" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <item name="colorPrimary">#9D00FF</item>
+        <item name="colorPrimary">#7034FF</item>
     </style>
 </resources>

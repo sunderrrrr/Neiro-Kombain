@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Html
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         etQuestion=findViewById(R.id.request)
 
         val btnSubmit=findViewById<Button>(R.id.sumbit)
-        idTVQuestion=findViewById<TextView>(R.id.quest)
+        //idTVQuestion=findViewById<TextView>(R.id.quest)
         txtResponse=findViewById<TextView>(R.id.result)
         txtResponse.movementMethod = ScrollingMovementMethod()
 
@@ -61,6 +62,7 @@ class MainActivity : AppCompatActivity() {
                 if(question.isNotEmpty()){
                     getResponse(question) { response ->
                         runOnUiThread {
+                            txtResponse.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
                             txtResponse.text = txtResponse.text.toString() +"\nChatGPT: $response\n"
                             /*Thread{
                                 for (letter in response){
@@ -80,7 +82,7 @@ class MainActivity : AppCompatActivity() {
     fun getResponse(question: String, callback: (String) -> Unit){
 
         // setting text on for question on below line.
-        idTVQuestion.text = "Ваш запрос: $edittextval"
+       // idTVQuestion.text = "Ваш запрос: $edittextval"
         //etQuestion.setText("")
 
         val apiKey="sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
