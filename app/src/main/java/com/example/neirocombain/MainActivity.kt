@@ -17,14 +17,20 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
-    private val client = OkHttpClient()
+
     // creating variables on below line.
     lateinit var txtResponse: TextView
     lateinit var idTVQuestion: TextView
     lateinit var etQuestion: EditText
     lateinit var edittextval: String
+    val client = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .writeTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .build()
     override fun onCreate(savedInstanceState: Bundle?) {
         //  val title = findViewById<TextView>(R.id.title)
         //val text = "<font color=#6314F4>Neiro</font><font color=#FFFFFF>.Combain</font>"
@@ -42,30 +48,33 @@ class MainActivity : AppCompatActivity() {
 
 
                 // setting response tv on below line.
-                txtResponse.text = "Печатает..."
+
+                txtResponse.text = "ChatGPT: Печатает..."
 
                 // validating text
                 edittextval = etQuestion.text.toString().trim()
+                println(edittextval)
                 val question = edittextval.replace(" ","")
+                val stringBuilder = StringBuilder()
                 //Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
                 if(question.isNotEmpty()){
                     getResponse(question) { response ->
                         runOnUiThread {
 
-                            for (i in 0 until response.length) {
-                                txtResponse.append(response[i].toString())
-                                
-                            }
+                            Thread{
+                                for (letter in response){
+                                    stringBuilder.append(letter)
+                                    Thread.sleep(25)
+                                    runOnUiThread{
+                                        txtResponse.text = stringBuilder.toString()
+                                    }
+                                }
+                            }.start()
                            // txtResponse.text = response
                         }
                     }
                 }
-
-
-
         }
-
-
     }
     fun getResponse(question: String, callback: (String) -> Unit){
 
@@ -110,7 +119,9 @@ class MainActivity : AppCompatActivity() {
                 var test = jsonArray.getJSONObject(0)
                 println("TEST $test")
                 val message = test.getJSONObject("message")
-                callback(message.getString("content").toString())
+                val final_res = message.getString("content").toString()
+                println(final_res)
+                callback(final_res)
 
             }
         })

@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C1C1C"
+    android:background="#1B1B1B"
     tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/title2"
-        android:layout_width="320dp"
-        android:layout_height="66dp"
+        android:layout_width="303dp"
+        android:layout_height="48dp"
         android:fontFamily="sans-serif-thin"
         android:text="Neiro/Kombain"
         android:textColor="#9D00FF"
@@ -18,22 +18,23 @@
         android:typeface="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.175"
+        app:layout_constraintHorizontal_bias="0.018"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.02" />
+        app:layout_constraintVertical_bias="0.01" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:layout_width="338dp"
-        android:layout_height="57dp"
+        android:layout_width="318dp"
+        android:layout_height="55dp"
         android:background="#002B2B2B"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.452"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.119" >
+        app:layout_constraintVertical_bias="0.119"
+        app:tabTextAppearance="@style/TextAppearance.AppCompat.Body1">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tabItem4"
@@ -50,38 +51,44 @@
 
     <Button
         android:id="@+id/sumbit"
-        android:layout_width="231dp"
-        android:layout_height="56dp"
+        android:layout_width="60dp"
+        android:layout_height="51dp"
+        android:layout_marginStart="5dp"
+        android:background="@android:drawable/ic_menu_send"
         android:fontFamily="sans-serif-light"
-        android:text="Отправить"
         android:textColor="#DFDFDF"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.12"
+        app:layout_constraintStart_toEndOf="@+id/request"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.958" />
+        app:layout_constraintVertical_bias="0.97" />
 
     <EditText
         android:id="@+id/request"
-        android:layout_width="318dp"
-        android:layout_height="59dp"
-
+        style="@android:style/Widget.Holo.Light.EditText"
+        android:layout_width="251dp"
+        android:layout_height="55dp"
+        android:background="@drawable/corner"
         android:ems="10"
+        android:fontFamily="sans-serif-light"
         android:hint="Запрос"
         android:inputType="textMultiLine"
+        android:paddingHorizontal="10sp"
         android:textAlignment="textStart"
         android:textColor="#FFEBEE"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.201"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.859" />
+        app:layout_constraintVertical_bias="0.969" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="332dp"
-        android:layout_height="454dp"
+        android:layout_width="316dp"
+        android:layout_height="412dp"
         android:orientation="vertical"
         android:verticalScrollbarPosition="right"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -89,16 +96,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <View
-            android:id="@+id/divider3"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider" />
-
         <TextView
             android:id="@+id/quest"
             android:layout_width="match_parent"
-            android:layout_height="53dp"
+            android:layout_height="39dp"
+            android:fontFamily="sans-serif-light"
             android:text="Запрос:"
             android:textAlignment="center"
             android:textSize="20sp" />
@@ -113,18 +115,18 @@
             android:id="@+id/result"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+
+            android:fontFamily="sans-serif-light"
+            android:overScrollMode="always"
             android:scrollIndicators="right"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
             android:scrollbars="vertical"
             android:scrollHorizontally="false"
+            android:selectAllOnFocus="true"
             android:text="Здесь появится ответ на ваш запрос:"
+            android:textIsSelectable="true"
             android:textSize="18sp"
             android:verticalScrollbarPosition="right" />
-
-        <View
-            android:id="@+id/divider2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider" />
 
     </LinearLayout>
 
