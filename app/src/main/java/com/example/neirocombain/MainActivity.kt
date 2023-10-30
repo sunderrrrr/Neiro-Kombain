@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
     var attemptsLeft = 15
     // creating variables on below line.
     lateinit var txtResponse: TextView
-    lateinit var idTVQuestion: TextView
     lateinit var etQuestion: EditText
     lateinit var edittextval: String
     val client = OkHttpClient.Builder()
@@ -50,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         var isFirstQuestInQuery = true
         txtResponse=findViewById<TextView>(R.id.result)
         txtResponse.movementMethod = ScrollingMovementMethod()
-        count_str.text = "Осталось запросо: $attemptsLeft"
+
         btnSubmit.setOnClickListener {
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 println(edittextval)
@@ -60,7 +59,7 @@ class MainActivity : AppCompatActivity() {
                     if (question.isNotEmpty() && question.length >= 3 && isSended == false) {
                         isSended = true
                         attemptsLeft= attemptsLeft-1
-                        count_str.text = "Осталось запросо: $attemptsLeft"
+                        //count_str.text = "${attemptsLeft.toString()}/15"
                         load.visibility = View.VISIBLE//Отправляем строку в функцию
                         getResponse(question) { response ->
                             runOnUiThread {

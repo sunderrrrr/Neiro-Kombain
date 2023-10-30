@@ -13,7 +13,7 @@
         android:layout_height="57dp"
         android:layout_marginBottom="400dp"
         android:background="@drawable/corner"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.452"
@@ -38,8 +38,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Kandinsky"
-            tools:layout_editor_absoluteX="202dp"
-            tools:layout_editor_absoluteY="78dp" />
+            tools:layout_editor_absoluteX="140dp"
+            tools:layout_editor_absoluteY="-15dp" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tabItem"
@@ -117,7 +117,7 @@
             android:scrollbars="vertical"
             android:scrollHorizontally="false"
             android:selectAllOnFocus="true"
-            android:text="Скорее напишите ChatGPT!"
+            android:text="Скорее напишите ChatGPT!\n\n Что я умею:\n\n 1.Объяснять что-либо; \n 2.Писать сочинения\n 3. Переводить на разные языки"
             android:textAlignment="center"
             android:textColorHint="#FFFFFF"
             android:textIsSelectable="true"
@@ -128,8 +128,8 @@
 
     <TextView
         android:id="@+id/count"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
+        android:layout_width="326dp"
+        android:layout_height="39dp"
         android:layout_marginTop="127dp"
         android:layout_marginBottom="689dp"
         android:fontFamily="sans-serif-light"
@@ -142,5 +142,39 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="319dp"
+        android:layout_height="52dp"
+        android:layout_marginBottom="700dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="69dp"
+            android:layout_height="54dp"
+            app:srcCompat="@android:drawable/ic_media_rew" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="110dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:paddingVertical="10dp"
+            android:text="ChatGPT"
+            android:textAlignment="center"
+            android:textSize="25sp" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:srcCompat="@android:drawable/ic_media_ff" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
