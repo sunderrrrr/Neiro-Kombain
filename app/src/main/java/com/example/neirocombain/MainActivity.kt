@@ -20,10 +20,14 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
+import java.time.Duration
+import java.time.LocalDateTime
+import java.util.Timer
+import java.util.TimerTask
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
-
+    var attemptsLeft = 15
     // creating variables on below line.
     lateinit var txtResponse: TextView
     lateinit var idTVQuestion: TextView
@@ -38,34 +42,76 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val count_str = findViewById<TextView>(R.id.count)
         etQuestion=findViewById(R.id.request)
         val load = findViewById<ProgressBar>(R.id.load)
         val btnSubmit=findViewById<Button>(R.id.sumbit)
-        //idTVQuestion=findViewById<TextView>(R.id.quest)
+        var isSended = false
+        var isFirstQuestInQuery = true
         txtResponse=findViewById<TextView>(R.id.result)
         txtResponse.movementMethod = ScrollingMovementMethod()
-
+        count_str.text = "Осталось запросо: $attemptsLeft"
         btnSubmit.setOnClickListener {
-                edittextval = etQuestion.text.toString().trim()
+                edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 println(edittextval)
                 val question = edittextval.replace(" ","")
                 //Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
-                if(question.isNotEmpty() && question.length>=3){
-                    txtResponse.text = ""
-                    load.visibility = View.VISIBLE//Отправляем строку в функцию
-                    getResponse(question) { response ->
-                        runOnUiThread {
-                            load.visibility = View.GONE
-                            txtResponse.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
-                            txtResponse.text = "Вы: $edittextval.capitalize()\n \nChatGPT: $response\n"
+                if (attemptsLeft > 0) {
+                    if (question.isNotEmpty() && question.length >= 3 && isSended == false) {
+                        isSended = true
+                        attemptsLeft= attemptsLeft-1
+                        count_str.text = "Осталось запросо: $attemptsLeft"
+                        load.visibility = View.VISIBLE//Отправляем строку в функцию
+                        getResponse(question) { response ->
+                            runOnUiThread {
+                                load.visibility = View.GONE
+                                txtResponse.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
+                                if (isFirstQuestInQuery == true) {
+                                    txtResponse.text = "Вы: $edittextval\n \nChatGPT: $response\n"
+                                    isSended = false
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Ура! Это ваш первый запрос",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    isFirstQuestInQuery = false
+                                } else {
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "В прошлый раз было " + txtResponse.text.toString(),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    txtResponse.text =
+                                        txtResponse.text.toString() + "\nВы: $edittextval\n \nChatGPT: $response\n"
+                                    isSended = false
+                                }
 
+                            }
                         }
+                    } else {
+                        if (isSended == true) {
+                            Toast.makeText(
+                                applicationContext,
+                                "Вы уже отправили запрос! Дождитесь ответа",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            load.visibility = View.GONE
+                            Toast.makeText(
+                                applicationContext,
+                                "Вы не ввели запрос или он слишком короткий!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
                     }
                 }
                 else{
-                    load.visibility = View.GONE
-                    Toast.makeText(applicationContext, "Вы не ввели запрос или он слишком короткий!", Toast.LENGTH_SHORT).show()
-
+                    Toast.makeText(
+                        applicationContext,
+                        "Количество попыток исчерпано. Посмотрите рекламу или приходите завтра",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
         }
     }
@@ -114,6 +160,20 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+    fun resetAttempts() {
+        val now = LocalDateTime.now()
+        val tomorrow = now.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+        val duration = Duration.between(now, tomorrow)
+        val secondsUntilTomorrow = duration.seconds
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                attemptsLeft = 15
+                println("Количество попыток восстановлено.")
+            }
+        }, secondsUntilTomorrow * 1000)
+    }
 
 
 }
+
+
