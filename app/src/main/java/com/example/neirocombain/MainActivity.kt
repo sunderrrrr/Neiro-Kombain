@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -12,6 +13,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -34,6 +37,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var txtResponse: TextView
     lateinit var etQuestion: EditText
     lateinit var edittextval: String
+    lateinit var messageRV: RecyclerView
+    lateinit var messageRVAdapter: MessageRVAdapter
+    lateinit var messageList: ArrayList<MessageRVModal>
+
     val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(10, TimeUnit.SECONDS)
@@ -48,7 +55,13 @@ class MainActivity : AppCompatActivity() {
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
         val model = findViewById<TextView>(R.id.model)
-        txtResponse=findViewById<TextView>(R.id.result)
+        txtResponse=findViewById(R.id.result)
+        messageList = ArrayList()
+        messageRV = findViewById(R.id.msgRV)
+        messageRVAdapter = MessageRVAdapter(messageList)
+        val layoutManager = LinearLayoutManager(applicationContext)
+        messageRV.layoutManager = layoutManager
+        messageRV.adapter = messageRVAdapter
         var isSended = false
         var isFirstQuestInQuery = true
         txtResponse.movementMethod = ScrollingMovementMethod()
@@ -60,6 +73,9 @@ class MainActivity : AppCompatActivity() {
             "ChatGPT",
             "GigaChat",
         )
+
+
+        //Конец объявления переменных
         left_btn.setOnClickListener{
             if (selectedNl==2) {
                 Timer().schedule(250) {
@@ -114,9 +130,13 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-        btnSubmit.setOnClickListener {
+        etQuestion.setOnEditorActionListener(TextView.OnEditorActionListener{textView, i, keyEvent ->
+            if (i==EditorInfo.IME_ACTION_SEND){
+                messageList.add(MessageRVModal(etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
+                    ,"user"))
+
+                messageRVAdapter.notifyDataSetChanged()
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
-                println(edittextval)
                 val question = edittextval.replace(" ","")
                 //Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
                 if (attemptsLeft > 0) {
@@ -127,30 +147,13 @@ class MainActivity : AppCompatActivity() {
                         load.visibility = View.VISIBLE//Отправляем строку в функцию
                         getResponse(question) { response ->
                             runOnUiThread {
+                                messageList.add(MessageRVModal(response
+                                    ,"bot"))
+                                messageRVAdapter.notifyDataSetChanged()
+                                println(messageList)
                                 load.visibility = View.GONE
-                                txtResponse.textAlignment = View.TEXT_ALIGNMENT_TEXT_START
-                                if (isFirstQuestInQuery == true) {
-                                    txtResponse.text = "Вы: $edittextval\n \nChatGPT: $response\n"
-                                    isSended = false
-                                    Toast.makeText(
-                                        applicationContext,
-                                        "Ура! Это ваш первый запрос",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    isFirstQuestInQuery = false
-                                } else {
-                                    Toast.makeText(
-                                        applicationContext,
-                                        "В прошлый раз было " + txtResponse.text.toString(),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    txtResponse.text =
-                                        txtResponse.text.toString() + "\nВы: $edittextval\n \nChatGPT: $response\n"
-                                    isSended = false
-                                }
-
-                            }
-                        }
+                            }}
+                        isSended = false
                     } else {
                         if (isSended == true) {
                             Toast.makeText(
@@ -176,7 +179,14 @@ class MainActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-        }
+
+            }
+            else{
+                println("123")
+            }
+
+        false
+        })
     }
     fun getResponse(question: String, callback: (String) -> Unit){ //Отправляем запрос
         val apiKey="sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
@@ -200,6 +210,11 @@ class MainActivity : AppCompatActivity() {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("error","API failed",e)
+                Toast.makeText(
+                    applicationContext,
+                    "Произошла ошибка на сервере! Повтрорите еще раз",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -218,6 +233,8 @@ class MainActivity : AppCompatActivity() {
                 val message = test.getJSONObject("message")
                 val final_res = message.getString("content").toString()
                 println(final_res)
+
+
                 callback(final_res)
 
             }

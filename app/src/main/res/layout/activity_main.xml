@@ -58,32 +58,36 @@
         android:fontFamily="sans-serif-light"
         android:textColor="#DFDFDF"
         android:textSize="24sp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/request"
+        app:layout_constraintHorizontal_bias="0.243"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.969" />
+        app:layout_constraintVertical_bias="0.875" />
 
-    <EditText
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/request"
         style="@android:style/Widget.Holo.Light.EditText"
-        android:layout_width="277dp"
-        android:layout_height="50dp"
+        android:layout_width="327dp"
+        android:layout_height="45dp"
         android:background="@drawable/corner"
+        android:drawableEnd="@android:drawable/ic_menu_send"
         android:ems="10"
         android:fontFamily="sans-serif-light"
         android:hint="Запрос"
-        android:inputType="textMultiLine"
+        android:imeOptions="actionSend"
+        android:inputType="text"
         android:paddingHorizontal="10sp"
         android:textAlignment="textStart"
         android:textColor="#FFEBEE"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.201"
+        app:layout_constraintHorizontal_bias="0.488"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.969" />
+        app:layout_constraintVertical_bias="0.967"
+        tools:ignore="HardcodedText" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -96,17 +100,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ProgressBar
-            android:id="@+id/load"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
-
         <TextView
             android:id="@+id/result"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="43dp"
 
             android:breakStrategy="high_quality"
             android:fontFamily="sans-serif-medium"
@@ -116,13 +113,20 @@
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:scrollbars="vertical"
             android:scrollHorizontally="false"
-            android:selectAllOnFocus="true"
-            android:text="Скорее напишите ChatGPT!\n\n Что я умею:\n\n 1.Объяснять что-либо;\n &quot;Объясни суть квантовой физики&quot;\n\n 2.Писать сочинения\n&quot;Напиши сочинение на тему &quot;Как окружение влияет на ребенка. &quot;&quot;\n\n 3. Переводить на разные языки \n&quot;Переведи Привет на Японский&quot;"
+            android:selectAllOnFocus="false"
+            android:text="отладка"
             android:textAlignment="center"
             android:textColorHint="#FFFFFF"
             android:textIsSelectable="true"
             android:textSize="18sp"
-            android:verticalScrollbarPosition="right" />
+            android:verticalScrollbarPosition="right"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/msgRV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:itemCount="20" />
 
     </LinearLayout>
 
@@ -175,5 +179,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.136" />
+
+    <ProgressBar
+        android:id="@+id/load"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="55dp"
+        android:layout_height="54dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.879" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

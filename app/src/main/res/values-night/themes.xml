@@ -5,4 +5,9 @@
         <item name="colorPrimary">#7034FF</item>
         <item name="android:statusBarColor">#150045</item>
     </style>
+    
+    <style name="TextInputLayoutStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="boxStrokeColor">#FFFFFF</item>
+        <item name="boxStrokeWidth">1dp</item>
+    </style>
 </resources>
