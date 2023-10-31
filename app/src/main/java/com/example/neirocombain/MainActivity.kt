@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -25,6 +26,7 @@ import java.time.LocalDateTime
 import java.util.Timer
 import java.util.TimerTask
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.schedule
 
 class MainActivity : AppCompatActivity() {
     var attemptsLeft = 15
@@ -38,18 +40,80 @@ class MainActivity : AppCompatActivity() {
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val count_str = findViewById<TextView>(R.id.count)
         etQuestion=findViewById(R.id.request)
         val load = findViewById<ProgressBar>(R.id.load)
         val btnSubmit=findViewById<Button>(R.id.sumbit)
+        val left_btn = findViewById<ImageView>(R.id.leftarr)
+        val right_btn = findViewById<ImageView>(R.id.rightarr)
+        val model = findViewById<TextView>(R.id.model)
+        txtResponse=findViewById<TextView>(R.id.result)
         var isSended = false
         var isFirstQuestInQuery = true
-        txtResponse=findViewById<TextView>(R.id.result)
         txtResponse.movementMethod = ScrollingMovementMethod()
+        var selectedNl = 1
+        var mode = "GPT"
+        val delay = 500
+        var nLinks = listOf(
+            "Kandinsky",
+            "ChatGPT",
+            "GigaChat",
+        )
+        left_btn.setOnClickListener{
+            if (selectedNl==2) {
+                Timer().schedule(250) {
+                    selectedNl = 1
+                    model.text = nLinks[selectedNl]
+                    mode = nLinks[selectedNl]
 
+                }
+            }
+            if (selectedNl ==1) {
+                Timer().schedule(250) {
+                    selectedNl = 0
+                    model.text = nLinks[selectedNl]
+                    mode = nLinks[selectedNl]
+
+                }
+            }
+            if (selectedNl == 0) {
+                Toast.makeText(
+                    applicationContext,
+                    "Увы, дальше ничего нет",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        }
+        right_btn.setOnClickListener{
+            if (selectedNl==2) {
+                Toast.makeText(
+                    applicationContext,
+                    "Увы, дальше ничего нет",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            if (selectedNl ==1) {
+                Timer().schedule(250) {
+                    selectedNl = 2
+                    model.text = nLinks[selectedNl]
+                    mode = nLinks[selectedNl]
+
+                }
+            }
+
+            if (selectedNl == 0) {
+                Timer().schedule(250) {
+                    selectedNl = 1
+                    model.text = nLinks[selectedNl]
+                    mode = nLinks[selectedNl]
+
+
+                }
+            }
+
+        }
         btnSubmit.setOnClickListener {
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 println(edittextval)

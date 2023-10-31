@@ -109,7 +109,7 @@
             android:layout_height="match_parent"
 
             android:breakStrategy="high_quality"
-            android:fontFamily="sans-serif-light"
+            android:fontFamily="sans-serif-medium"
             android:overScrollMode="always"
             android:paddingTop="5sp"
             android:scrollIndicators="right"
@@ -117,7 +117,7 @@
             android:scrollbars="vertical"
             android:scrollHorizontally="false"
             android:selectAllOnFocus="true"
-            android:text="Скорее напишите ChatGPT!\n\n Что я умею:\n\n 1.Объяснять что-либо; \n 2.Писать сочинения\n 3. Переводить на разные языки"
+            android:text="Скорее напишите ChatGPT!\n\n Что я умею:\n\n 1.Объяснять что-либо;\n &quot;Объясни суть квантовой физики&quot;\n\n 2.Писать сочинения\n&quot;Напиши сочинение на тему &quot;Как окружение влияет на ребенка. &quot;&quot;\n\n 3. Переводить на разные языки \n&quot;Переведи Привет на Японский&quot;"
             android:textAlignment="center"
             android:textColorHint="#FFFFFF"
             android:textIsSelectable="true"
@@ -125,23 +125,6 @@
             android:verticalScrollbarPosition="right" />
 
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/count"
-        android:layout_width="326dp"
-        android:layout_height="39dp"
-        android:layout_marginTop="127dp"
-        android:layout_marginBottom="689dp"
-        android:fontFamily="sans-serif-light"
-        android:text="15/15"
-        android:textAlignment="center"
-        android:textColorHint="#FFFFFF"
-        android:textSize="24sp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:layout_width="319dp"
@@ -154,27 +137,43 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="69dp"
-            android:layout_height="54dp"
-            app:srcCompat="@android:drawable/ic_media_rew" />
+            android:id="@+id/leftarr"
+            android:layout_width="62dp"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/left_arr_invert" />
 
         <TextView
-            android:id="@+id/textView3"
-            android:layout_width="110dp"
+            android:id="@+id/model"
+            android:layout_width="273dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:paddingVertical="10dp"
+            android:background="@drawable/neiro_bg"
+            android:paddingVertical="8dp"
             android:text="ChatGPT"
             android:textAlignment="center"
-            android:textSize="25sp" />
+            android:textSize="25sp"
+            android:textStyle="bold" />
 
         <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="2dp"
+            android:id="@+id/rightarr"
+            android:layout_width="134dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            app:srcCompat="@android:drawable/ic_media_ff" />
+            app:srcCompat="@drawable/right_arr_invert" />
+
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="103dp"
+        android:layout_height="53dp"
+        android:text="15/15"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.136" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
