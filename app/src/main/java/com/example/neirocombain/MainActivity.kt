@@ -17,9 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
@@ -46,6 +48,8 @@ class MainActivity : AppCompatActivity() {
         .writeTimeout(10, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
+    var mode = "ChatGPT"
+    var msgList_FNL = mutableListOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -132,10 +136,18 @@ class MainActivity : AppCompatActivity() {
         }
         etQuestion.setOnEditorActionListener(TextView.OnEditorActionListener{textView, i, keyEvent ->
             if (i==EditorInfo.IME_ACTION_SEND){
-                messageList.add(MessageRVModal(etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
+                val final_send = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
+                messageList.add(MessageRVModal(final_send
                     ,"user"))
 
                 messageRVAdapter.notifyDataSetChanged()
+                val user_mask = "{\n" +
+                        "            \"role\": \"user\",\n" +
+                        "            \"content\": \"$final_send\"\n" +
+                        "        }"
+
+                msgList_FNL.add(user_mask)
+
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 val question = edittextval.replace(" ","")
                 //Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
@@ -150,8 +162,16 @@ class MainActivity : AppCompatActivity() {
                                 messageList.add(MessageRVModal(response
                                     ,"bot"))
                                 messageRVAdapter.notifyDataSetChanged()
-                                println(messageList)
+                                println("МАССИВ $messageList")
                                 load.visibility = View.GONE
+                                val user_mask = "{\n" +
+                                        "            \"role\": \"assistant\",\n" +
+                                        "            \"content\": \"$response\"\n" +
+                                        "        }"
+                                msgList_FNL.add(user_mask)
+                                println(msgList_FNL)
+
+
                             }}
                         isSended = false
                     } else {
@@ -189,56 +209,80 @@ class MainActivity : AppCompatActivity() {
         })
     }
     fun getResponse(question: String, callback: (String) -> Unit){ //Отправляем запрос
-        val apiKey="sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
-        val url="https://api.proxyapi.ru/openai/v1/chat/completions"
+        if (mode=="ChatGPT") {
+            val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
+            val url = "https://api.proxyapi.ru/openai/v1/chat/completions"
+            val last_symb = msgList_FNL.toString().length
+            val last_id = last_symb - 1
+            val msg_req = msgList_FNL.toString().substring(1..last_symb-2)
 
-        val requestBody="""
+            val requestBody = """
             {
-            "model": "gpt-3.5-turbo",
-            "messages": [{"role": "user", "content": "$question"}],
-            "temperature": 0.0
+                "model": "gpt-3.5-turbo",
+                "messages": [$msg_req],
+                "temperature": 0.0
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Bearer $apiKey")
-            .post(requestBody.toRequestBody("application/json".toMediaTypeOrNull()))
-            .build()
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "Bearer $apiKey")
+                .post(requestBody.trimIndent().toRequestBody("application/json".toMediaTypeOrNull()))
+                .build()
+            println(request.toString())
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e("error","API failed",e)
-                Toast.makeText(
-                    applicationContext,
-                    "Произошла ошибка на сервере! Повтрорите еще раз",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                val body=response.body?.string()
-                if (body != null) {
-                    Log.v("data",body)
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                   println("API failed")
+                    Toast.makeText(
+                        applicationContext,
+                        "Произошла ошибка на сервере! Повтрорите еще раз",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                else{
-                    Log.v("data","empty")
+
+                override fun onResponse(call: Call, response: Response) {
+                    val body = response.body?.string()
+                    if (body != null) {
+                        Log.v("data", body)
+                    } else {
+                        Log.v("data", "empty")
+                    }
+                    val jsonObject = JSONObject(body)
+                    val jsonArray = jsonObject.getJSONArray("choices")
+                    println("JSON ARRAY: $jsonArray")
+                    var test = jsonArray.getJSONObject(0)
+                    println("TEST $test")
+                    val message = test.getJSONObject("message")
+                    val final_res = message.getString("content").toString()
+                    println(final_res)
+
+
+                    callback(final_res)
                 }
-                val jsonObject= JSONObject(body)
-                val jsonArray=jsonObject.getJSONArray("choices")
-                println("JSON ARRAY: $jsonArray")
-                var test = jsonArray.getJSONObject(0)
-                println("TEST $test")
-                val message = test.getJSONObject("message")
-                val final_res = message.getString("content").toString()
-                println(final_res)
 
+            })
+        }
+        if (mode=="Kandinsky"){
+            Toast.makeText(
+                applicationContext,
+                "Выбрана модеьль Kandinsky",
+                Toast.LENGTH_SHORT
+            ).show()
+            val mediaType = "application/json".toMediaTypeOrNull()
+            val body =""
 
-                callback(final_res)
+            val request = Request.Builder()
+                .url("https://gigachat.devices.sberbank.ru/api/v1/chat/completions")
+                .post(body.toRequestBody())
 
-            }
-        })
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "Bearer d38e0ee2-ae61-4035-9e02-8b07764a8ac1")
+                .build()
+
+            val response = client.newCall(request).execute()
+        }
     }
     fun resetAttempts() {
         val now = LocalDateTime.now()
