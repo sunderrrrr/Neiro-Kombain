@@ -6,7 +6,6 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -18,15 +17,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
-import org.w3c.dom.Text
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
@@ -58,12 +54,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         etQuestion=findViewById(R.id.request)
         val load = findViewById<ProgressBar>(R.id.load)
-
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
         val model = findViewById<TextView>(R.id.model)
         val attempts_text = findViewById<TextView>(R.id.attemts)
-        txtResponse=findViewById(R.id.result)
+        txtResponse=findViewById(R.id.desc)
         messageList = ArrayList()
         messageRV = findViewById(R.id.msgRV)
         messageRVAdapter = MessageRVAdapter(messageList)
@@ -154,9 +149,11 @@ class MainActivity : AppCompatActivity() {
                 val question = edittextval.replace(" ","")
                 //Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
                 if (attemptsLeft > 0) {
+                    txtResponse.visibility = View.GONE
+                    messageRV.visibility = View.VISIBLE
                     if (question.isNotEmpty() && question.length >= 3 && isSended == false) {
                         isSended = true
-
+                        etQuestion.setText("")
                         //count_str.text = "${attemptsLeft.toString()}/15"
                         load.visibility = View.VISIBLE//Отправляем строку в функцию
                         getResponse(question) { response ->
@@ -164,7 +161,7 @@ class MainActivity : AppCompatActivity() {
                                 attemptsLeft= attemptsLeft-1
                                 messageList.add(MessageRVModal(response
                                     ,"bot"))
-                                messageRVAdapter.notifyDataSetChanged()
+                                messageRVAdapter.run { notifyDataSetChanged() }
                                 println("МАССИВ $messageList")
                                 load.visibility = View.GONE
                                 val user_mask = "{\n" +

@@ -51,12 +51,12 @@
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/request"
         style="@android:style/Widget.Holo.Light.EditText"
-        android:layout_width="327dp"
-        android:layout_height="45dp"
+        android:layout_width="326dp"
+        android:layout_height="54dp"
         android:background="@drawable/corner"
         android:drawableEnd="@android:drawable/ic_menu_send"
         android:ems="10"
-        android:fontFamily="sans-serif-light"
+        android:fontFamily="sans-serif-medium"
         android:hint="Запрос"
         android:imeOptions="actionSend"
         android:inputType="text"
@@ -82,31 +82,32 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/result"
+            android:id="@+id/desc"
             android:layout_width="match_parent"
-            android:layout_height="43dp"
+            android:layout_height="match_parent"
 
             android:breakStrategy="high_quality"
             android:fontFamily="sans-serif-medium"
             android:overScrollMode="always"
-            android:paddingTop="5sp"
+            android:paddingTop="70sp"
             android:scrollIndicators="right"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:scrollbars="vertical"
             android:scrollHorizontally="false"
             android:selectAllOnFocus="false"
-            android:text="отладка"
+            android:text="Что умеет ChatGPT: \n\n 1. Писать сочинения. \n &quot;Напиши сочинение о конфликте поколений&quot; \n\n 2.Объяснять что-либо.\n &quot;Объясни в кратце законы Ньютона&quot; \n\n 3. Переводить на другие языки \n &quot;Переведи привет на Японский&quot;"
             android:textAlignment="center"
             android:textColorHint="#FFFFFF"
             android:textIsSelectable="true"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:verticalScrollbarPosition="right"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/msgRV"
             android:layout_width="match_parent"
             android:layout_height="469dp"
+            android:visibility="gone"
             tools:itemCount="20" />
 
     </LinearLayout>
@@ -126,6 +127,8 @@
             android:id="@+id/leftarr"
             android:layout_width="62dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10sp"
+            android:layout_marginBottom="10sp"
             app:srcCompat="@drawable/left_arr_invert" />
 
         <TextView
@@ -144,6 +147,8 @@
             android:id="@+id/rightarr"
             android:layout_width="134dp"
             android:layout_height="match_parent"
+            android:layout_marginTop="10sp"
+            android:layout_marginBottom="10sp"
             android:layout_weight="1"
             app:srcCompat="@drawable/right_arr_invert" />
 
@@ -154,6 +159,7 @@
         android:layout_width="103dp"
         android:layout_height="53dp"
         android:layout_marginTop="6dp"
+        android:fontFamily="sans-serif-medium"
         android:text="15/15"
         android:textAlignment="center"
         android:textSize="24sp"
