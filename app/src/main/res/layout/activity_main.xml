@@ -48,24 +48,6 @@
             android:text="Giga Chat" />
     </com.google.android.material.tabs.TabLayout>
 
-    <Button
-        android:id="@+id/sumbit"
-        android:layout_width="60dp"
-        android:layout_height="51dp"
-        android:layout_marginStart="5dp"
-        android:background="@android:drawable/ic_menu_send"
-        android:backgroundTint="#AC0C0C"
-        android:fontFamily="sans-serif-light"
-        android:textColor="#DFDFDF"
-        android:textSize="24sp"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.243"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.875" />
-
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/request"
         style="@android:style/Widget.Holo.Light.EditText"
@@ -125,15 +107,16 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/msgRV"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="469dp"
             tools:itemCount="20" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="319dp"
         android:layout_height="52dp"
-        android:layout_marginBottom="700dp"
+        android:layout_marginBottom="630dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -168,17 +151,18 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/attemts"
         android:layout_width="103dp"
         android:layout_height="53dp"
+        android:layout_marginTop="6dp"
         android:text="15/15"
         android:textAlignment="center"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.136" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+        app:layout_constraintVertical_bias="0.0" />
 
     <ProgressBar
         android:id="@+id/load"

@@ -13,6 +13,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import okhttp3.Call
@@ -25,6 +26,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
+import org.w3c.dom.Text
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
@@ -52,13 +54,15 @@ class MainActivity : AppCompatActivity() {
     var msgList_FNL = mutableListOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
         etQuestion=findViewById(R.id.request)
         val load = findViewById<ProgressBar>(R.id.load)
-        val btnSubmit=findViewById<Button>(R.id.sumbit)
+
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
         val model = findViewById<TextView>(R.id.model)
+        val attempts_text = findViewById<TextView>(R.id.attemts)
         txtResponse=findViewById(R.id.result)
         messageList = ArrayList()
         messageRV = findViewById(R.id.msgRV)
@@ -67,12 +71,10 @@ class MainActivity : AppCompatActivity() {
         messageRV.layoutManager = layoutManager
         messageRV.adapter = messageRVAdapter
         var isSended = false
-        var isFirstQuestInQuery = true
         txtResponse.movementMethod = ScrollingMovementMethod()
         var selectedNl = 1
         var mode = "GPT"
-        val delay = 500
-        var nLinks = listOf(
+        val nLinks = listOf(
             "Kandinsky",
             "ChatGPT",
             "GigaChat",
@@ -154,11 +156,12 @@ class MainActivity : AppCompatActivity() {
                 if (attemptsLeft > 0) {
                     if (question.isNotEmpty() && question.length >= 3 && isSended == false) {
                         isSended = true
-                        attemptsLeft= attemptsLeft-1
+
                         //count_str.text = "${attemptsLeft.toString()}/15"
                         load.visibility = View.VISIBLE//Отправляем строку в функцию
                         getResponse(question) { response ->
                             runOnUiThread {
+                                attemptsLeft= attemptsLeft-1
                                 messageList.add(MessageRVModal(response
                                     ,"bot"))
                                 messageRVAdapter.notifyDataSetChanged()
@@ -170,6 +173,8 @@ class MainActivity : AppCompatActivity() {
                                         "        }"
                                 msgList_FNL.add(user_mask)
                                 println(msgList_FNL)
+                                attempts_text.text = "$attemptsLeft/15"
+
 
 
                             }}
