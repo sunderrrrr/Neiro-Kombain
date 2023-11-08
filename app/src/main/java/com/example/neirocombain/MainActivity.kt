@@ -2,7 +2,6 @@ package com.example.neirocombain
 
 
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -22,12 +21,14 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.Timer
 import java.util.TimerTask
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
     var mode = "ChatGPT"
+    var selectedNl = 1
     var msgList_FNL = mutableListOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,11 +68,9 @@ class MainActivity : AppCompatActivity() {
         messageRV.layoutManager = layoutManager
         messageRV.adapter = messageRVAdapter
         var isSended = false
-        txtResponse.movementMethod = ScrollingMovementMethod()
-        var selectedNl = 1
-        var mode = "GPT"
+
         val nLinks = listOf(
-            "Kandinsky",
+            "DALLE-E",
             "ChatGPT",
             "GigaChat",
         )
@@ -83,7 +83,10 @@ class MainActivity : AppCompatActivity() {
                     selectedNl = 1
                     model.text = nLinks[selectedNl]
                     mode = nLinks[selectedNl]
-
+                    runOnUiThread {
+                        txtResponse.text =
+                            "Что умеет ChatGPT: \n\n"+" 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
+                    }
                 }
             }
             if (selectedNl ==1) {
@@ -91,7 +94,11 @@ class MainActivity : AppCompatActivity() {
                     selectedNl = 0
                     model.text = nLinks[selectedNl]
                     mode = nLinks[selectedNl]
+                    runOnUiThread {
 
+                        txtResponse.text =
+                            "Что умеет Dall-e 2:\n\n Может нарисовать картинку по вашему текстовому запросу в разрешении 512*512 пикселей. \n Фотореализм, аниме, краски итд."
+                    }
                 }
             }
             if (selectedNl == 0) {
@@ -116,7 +123,9 @@ class MainActivity : AppCompatActivity() {
                     selectedNl = 2
                     model.text = nLinks[selectedNl]
                     mode = nLinks[selectedNl]
-
+                    runOnUiThread {
+                        txtResponse.text = "Что умеет GigaChat: \n\n"
+                    }
                 }
             }
 
@@ -125,6 +134,10 @@ class MainActivity : AppCompatActivity() {
                     selectedNl = 1
                     model.text = nLinks[selectedNl]
                     mode = nLinks[selectedNl]
+                    runOnUiThread {
+                        txtResponse.text = "Что умеет ChatGPT: \n\n"+" 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
+
+                    }
 
 
                 }
@@ -144,7 +157,7 @@ class MainActivity : AppCompatActivity() {
                         "        }"
 
                 msgList_FNL.add(user_mask)
-
+                println(msgList_FNL)
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 val question = edittextval.replace(" ","")
                 //Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
@@ -152,15 +165,19 @@ class MainActivity : AppCompatActivity() {
                     txtResponse.visibility = View.GONE
                     messageRV.visibility = View.VISIBLE
                     if (question.isNotEmpty() && question.length >= 3 && isSended == false) {
-                        isSended = true
+                        if (mode !== "DALLE-E"){
+                            isSended = true
                         etQuestion.setText("")
                         //count_str.text = "${attemptsLeft.toString()}/15"
                         load.visibility = View.VISIBLE//Отправляем строку в функцию
                         getResponse(question) { response ->
                             runOnUiThread {
-                                attemptsLeft= attemptsLeft-1
-                                messageList.add(MessageRVModal(response
-                                    ,"bot"))
+                                messageRV.visibility = View.VISIBLE
+                                messageList.add(
+                                    MessageRVModal(
+                                        response, "bot"
+                                    )
+                                )
                                 messageRVAdapter.run { notifyDataSetChanged() }
                                 println("МАССИВ $messageList")
                                 load.visibility = View.GONE
@@ -170,13 +187,39 @@ class MainActivity : AppCompatActivity() {
                                         "        }"
                                 msgList_FNL.add(user_mask)
                                 println(msgList_FNL)
+                                attemptsLeft = attemptsLeft - 1
                                 attempts_text.text = "$attemptsLeft/15"
 
 
-
-                            }}
+                            }
+                        }
                         isSended = false
-                    } else {
+                    }
+                        else{
+                            messageRV.visibility = View.GONE
+                            getResponse(question) { response ->
+                                runOnUiThread {
+
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Dalle-2",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
+
+
+                                    load.visibility = View.GONE
+
+
+                                    attemptsLeft = attemptsLeft - 1
+                                    attempts_text.text = "$attemptsLeft/15"
+
+
+                                }
+                            }
+                        }
+                }
+                    else {
                         if (isSended == true) {
                             Toast.makeText(
                                 applicationContext,
@@ -210,13 +253,13 @@ class MainActivity : AppCompatActivity() {
         false
         })
     }
-    fun getResponse(question: String, callback: (String) -> Unit){ //Отправляем запрос
-        if (mode=="ChatGPT") {
+    fun getResponse(question: String, callback: (String) -> Unit) { //Отправляем запрос
+        if (mode == "ChatGPT") {
             val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
             val url = "https://api.proxyapi.ru/openai/v1/chat/completions"
             val last_symb = msgList_FNL.toString().length
             val last_id = last_symb - 1
-            val msg_req = msgList_FNL.toString().substring(1..last_symb-2)
+            val msg_req = msgList_FNL.toString().substring(1..last_symb - 2)
 
             val requestBody = """
             {
@@ -230,18 +273,18 @@ class MainActivity : AppCompatActivity() {
                 .url(url)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", "Bearer $apiKey")
-                .post(requestBody.trimIndent().toRequestBody("application/json".toMediaTypeOrNull()))
+                .post(
+                    requestBody.trimIndent().toRequestBody("application/json".toMediaTypeOrNull())
+                )
                 .build()
             println(request.toString())
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                   println("API failed")
-                    Toast.makeText(
-                        applicationContext,
-                        "Произошла ошибка на сервере! Повтрорите еще раз",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    println("API failed")
+
+                    callback("К сожалению произошла ошибка(. Количество запросов не уменьшено")
+                    attemptsLeft = attemptsLeft + 1
                 }
 
                 override fun onResponse(call: Call, response: Response) {
@@ -251,40 +294,97 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         Log.v("data", "empty")
                     }
-                    val jsonObject = JSONObject(body)
-                    val jsonArray = jsonObject.getJSONArray("choices")
-                    println("JSON ARRAY: $jsonArray")
-                    var test = jsonArray.getJSONObject(0)
-                    println("TEST $test")
-                    val message = test.getJSONObject("message")
-                    val final_res = message.getString("content").toString()
-                    println(final_res)
+                    try {
+                        val jsonObject = JSONObject(body)
+                        val jsonArray = jsonObject.getJSONArray("choices")
+                        println("JSON ARRAY: $jsonArray")
+                        var test = jsonArray.getJSONObject(0)
+                        println("TEST $test")
+                        val message = test.getJSONObject("message")
+                        val final_res = message.getString("content").toString()
+                        println(final_res)
 
 
-                    callback(final_res)
+                        callback(final_res)
+                    } catch (e: JSONException) {
+                        callback("К сожалению сервер сейчас недоступен. Попробуйте позже")
+                    }
                 }
 
             })
         }
-        if (mode=="Kandinsky"){
-            Toast.makeText(
-                applicationContext,
-                "Выбрана модеьль Kandinsky",
-                Toast.LENGTH_SHORT
-            ).show()
-            val mediaType = "application/json".toMediaTypeOrNull()
-            val body =""
+        if (mode == "DALLE-E") {
 
+            println("Отправляю запрос")
+            val body = """
+            {
+            "model": "dall-e-2",
+            "prompt": "$question",
+            "n": 1,
+            "response_format": "url",
+            "size": "256x256"
+          }
+            """.trimIndent()
+
+            val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
             val request = Request.Builder()
-                .url("https://gigachat.devices.sberbank.ru/api/v1/chat/completions")
-                .post(body.toRequestBody())
 
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "Bearer d38e0ee2-ae61-4035-9e02-8b07764a8ac1")
+                .url("https://api.proxyapi.ru/openai/v1/images/generations")
+                .header("Content-Type", "application/json")
+                .addHeader("Authorization", "Bearer $apiKey")
+                .post(body.toRequestBody("application/json".toMediaTypeOrNull()))
                 .build()
+            println(request.toString())
 
-            val response = client.newCall(request).execute()
+
+
+            val executor = Executors.newSingleThreadExecutor()
+            executor.execute(Runnable {
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+
+                    println(response.body!!)
+                    val resp = response.body?.string()
+
+                    val body_json = JSONObject(resp)
+                    println(body_json)
+
+
+                }
+
+                    fun onResponse(call: Call, response: Response) {
+                        val bodyy = response.body?.string()
+                        if (bodyy != null) {
+                            println("D3 $bodyy")
+                            println(bodyy.length.toInt())
+
+                        } else {
+                            println("D3 empty")
+                        }
+                        try {
+
+                            //val jsonArray = jsonObject.getJSONArray("choices")
+                           // println("JSON ARRAY: $jsonArray")
+                            //var test = jsonArray.getJSONObject(0)
+                            //println("TEST $test")
+                            //val message = test.getJSONObject("message")
+                            //val final_res = message.getString("content").toString()
+                            //println(final_res)
+
+
+                           // callback(final_res)
+                        } catch (e: JSONException) {
+                            callback("К сожалению сервер сейчас недоступен. Попробуйте позже")
+                        }
+                    }
+
+                })
+            }
+
         }
+
+
+
     }
     fun resetAttempts() {
         val now = LocalDateTime.now()
@@ -293,13 +393,11 @@ class MainActivity : AppCompatActivity() {
         val secondsUntilTomorrow = duration.seconds
         Timer().schedule(object : TimerTask() {
             override fun run() {
-                attemptsLeft = 15
+                var attemptsLeft = 15
                 println("Количество попыток восстановлено.")
             }
         }, secondsUntilTomorrow * 1000)
     }
 
-
-}
 
 

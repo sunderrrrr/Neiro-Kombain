@@ -4,71 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient"
+    android:background="#121212"
     tools:context=".MainActivity">
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabLayout"
-        android:layout_width="344dp"
-        android:layout_height="57dp"
-        android:layout_marginBottom="400dp"
-        android:background="@drawable/corner"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.452"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.119"
-        app:tabIndicatorColor="@color/design_default_color_primary"
-        app:tabRippleColor="@color/design_default_color_primary"
-        app:tabTextAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:tabTextColor="@color/white">
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabItem4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ChatGPT"
-            tools:layout_editor_absoluteX="30dp"
-            tools:layout_editor_absoluteY="78dp" />
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabItem3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Kandinsky"
-            tools:layout_editor_absoluteX="140dp"
-            tools:layout_editor_absoluteY="-15dp" />
-
-        <com.google.android.material.tabs.TabItem
-            android:id="@+id/tabItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Giga Chat" />
-    </com.google.android.material.tabs.TabLayout>
-
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/request"
-        style="@android:style/Widget.Holo.Light.EditText"
-        android:layout_width="326dp"
-        android:layout_height="54dp"
-        android:background="@drawable/corner"
-        android:drawableEnd="@android:drawable/ic_menu_send"
-        android:ems="10"
-        android:fontFamily="sans-serif-medium"
-        android:hint="Запрос"
-        android:imeOptions="actionSend"
-        android:inputType="text"
-        android:paddingHorizontal="10sp"
-        android:textAlignment="textStart"
-        android:textColor="#FFEBEE"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.946"
-        tools:ignore="HardcodedText" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -87,9 +24,9 @@
             android:layout_height="match_parent"
 
             android:breakStrategy="high_quality"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="sans-serif"
             android:overScrollMode="always"
-            android:paddingTop="70sp"
+            android:paddingTop="100sp"
             android:scrollIndicators="right"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:scrollbars="vertical"
@@ -109,6 +46,14 @@
             android:layout_height="469dp"
             android:visibility="gone"
             tools:itemCount="20" />
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:visibility="gone"
+            tools:srcCompat="@tools:sample/avatars" />
 
     </LinearLayout>
 
@@ -140,6 +85,7 @@
             android:paddingVertical="8dp"
             android:text="ChatGPT"
             android:textAlignment="center"
+            android:textColor="#FFFFFF"
             android:textSize="25sp"
             android:textStyle="bold" />
 
@@ -159,7 +105,7 @@
         android:layout_width="103dp"
         android:layout_height="53dp"
         android:layout_marginTop="6dp"
-        android:fontFamily="sans-serif-medium"
+        android:fontFamily="sans-serif"
         android:text="15/15"
         android:textAlignment="center"
         android:textSize="24sp"
@@ -179,6 +125,30 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.879" />
+        app:layout_constraintVertical_bias="0.853" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/request"
+        style="@android:style/Widget.Holo.Light.EditText"
+        android:layout_width="342dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/corner"
+        android:drawableEnd="@android:drawable/ic_menu_send"
+        android:ems="10"
+        android:fontFamily="sans-serif"
+        android:hint="Запрос"
+        android:imeOptions="actionSend"
+        android:inputType="text"
+        android:paddingHorizontal="10sp"
+        android:textAlignment="textStart"
+        android:textColor="#FFEBEE"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

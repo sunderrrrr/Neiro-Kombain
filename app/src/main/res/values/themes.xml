@@ -4,6 +4,9 @@
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="colorPrimary">#7034FF</item>
+        <item name="android:background">#FFFFFF</item>
+        <item name="android:background">#FFFFFF</item>
+
     </style>
 
     <style name="Theme.NeiroCombain" parent="Base.Theme.NeiroCombain" />
