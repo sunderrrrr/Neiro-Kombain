@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
         etQuestion=findViewById(R.id.request)
-        val load = findViewById<ProgressBar>(R.id.load)
+
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
         val model = findViewById<TextView>(R.id.model)
@@ -144,17 +145,14 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-        etQuestion.setOnEditorActionListener(TextView.OnEditorActionListener{textView, i, keyEvent ->
+        etQuestion.setOnEditorActionListener(OnEditorActionListener{ textView, i, keyEvent ->
             if (i==EditorInfo.IME_ACTION_SEND){
                 val final_send = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 messageList.add(MessageRVModal(final_send
                     ,"user"))
 
                 messageRVAdapter.notifyDataSetChanged()
-                val user_mask = "{\n" +
-                        "            \"role\": \"user\",\n" +
-                        "            \"content\": \"$final_send\"\n" +
-                        "        }"
+                val user_mask = "{\n" + "\"role\": \"user\",\n" + "\"content\": \"$final_send\"\n" + "}"
 
                 msgList_FNL.add(user_mask)
                 println(msgList_FNL)
@@ -168,11 +166,14 @@ class MainActivity : AppCompatActivity() {
                         if (mode !== "DALLE-E"){
                             isSended = true
                         etQuestion.setText("")
-                        //count_str.text = "${attemptsLeft.toString()}/15"
-                        load.visibility = View.VISIBLE//Отправляем строку в функцию
+                            messageList.add(MessageRVModal("Печатает...", "bot"))
+
+
+                        //Отправляем строку в функцию
                         getResponse(question) { response ->
                             runOnUiThread {
                                 messageRV.visibility = View.VISIBLE
+                                messageList.removeLast()
                                 messageList.add(
                                     MessageRVModal(
                                         response, "bot"
@@ -180,11 +181,7 @@ class MainActivity : AppCompatActivity() {
                                 )
                                 messageRVAdapter.run { notifyDataSetChanged() }
                                 println("МАССИВ $messageList")
-                                load.visibility = View.GONE
-                                val user_mask = "{\n" +
-                                        "            \"role\": \"assistant\",\n" +
-                                        "            \"content\": \"$response\"\n" +
-                                        "        }"
+                                val user_mask = "{\n" + "\"role\": \"assistant\",\n" + "\"content\": \"$response\"\n" + "}"
                                 msgList_FNL.add(user_mask)
                                 println(msgList_FNL)
                                 attemptsLeft = attemptsLeft - 1
@@ -195,7 +192,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         isSended = false
                     }
-                        else{
+                        else{//DALL E
                             messageRV.visibility = View.GONE
                             getResponse(question) { response ->
                                 runOnUiThread {
@@ -208,7 +205,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-                                    load.visibility = View.GONE
+
 
 
                                     attemptsLeft = attemptsLeft - 1
@@ -227,7 +224,7 @@ class MainActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
-                            load.visibility = View.GONE
+
                             Toast.makeText(
                                 applicationContext,
                                 "Вы не ввели запрос или он слишком короткий!",
@@ -269,6 +266,7 @@ class MainActivity : AppCompatActivity() {
             }
             """.trimIndent()
 
+
             val request = Request.Builder()
                 .url(url)
                 .addHeader("Content-Type", "application/json")
@@ -276,6 +274,7 @@ class MainActivity : AppCompatActivity() {
                 .post(
                     requestBody.trimIndent().toRequestBody("application/json".toMediaTypeOrNull())
                 )
+
                 .build()
             println(request.toString())
 
@@ -297,16 +296,17 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val jsonObject = JSONObject(body)
                         val jsonArray = jsonObject.getJSONArray("choices")
-                        println("JSON ARRAY: $jsonArray")
+                       // println("JSON ARRAY: $jsonArray")
                         var test = jsonArray.getJSONObject(0)
-                        println("TEST $test")
+                        //println("TEST $test")
                         val message = test.getJSONObject("message")
                         val final_res = message.getString("content").toString()
-                        println(final_res)
+                       // println(final_res)
 
 
                         callback(final_res)
                     } catch (e: JSONException) {
+                        println(body)
                         callback("К сожалению сервер сейчас недоступен. Попробуйте позже")
                     }
                 }
