@@ -27,7 +27,7 @@
             android:breakStrategy="high_quality"
             android:fontFamily="sans-serif"
             android:overScrollMode="always"
-            android:paddingTop="100sp"
+            android:paddingTop="80sp"
             android:scrollIndicators="right"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:scrollbars="vertical"

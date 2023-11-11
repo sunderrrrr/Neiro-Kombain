@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity() {
                     ,"user"))
 
                 messageRVAdapter.notifyDataSetChanged()
-                val user_mask = "{\n" + "\"role\": \"user\",\n" + "\"content\": \"$final_send\"\n" + "}"
+                val user_mask = """{"role": "user", "content" :"$final_send"}"""
 
                 msgList_FNL.add(user_mask)
                 println(msgList_FNL)
@@ -181,10 +181,10 @@ class MainActivity : AppCompatActivity() {
                                 )
                                 messageRVAdapter.run { notifyDataSetChanged() }
                                 println("МАССИВ $messageList")
-                                val user_mask = "{\n" + "\"role\": \"assistant\",\n" + "\"content\": \"$response\"\n" + "}"
-                                msgList_FNL.add(user_mask)
-                                println(msgList_FNL)
-                                attemptsLeft = attemptsLeft - 1
+                                val nl_mask = """{"role": "assistant", "content" :"$response"}"""
+                                msgList_FNL.add(nl_mask)
+                                //println(msgList_FNL)
+                                attemptsLeft -= 1
                                 attempts_text.text = "$attemptsLeft/15"
 
 
@@ -255,7 +255,6 @@ class MainActivity : AppCompatActivity() {
             val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
             val url = "https://api.proxyapi.ru/openai/v1/chat/completions"
             val last_symb = msgList_FNL.toString().length
-            val last_id = last_symb - 1
             val msg_req = msgList_FNL.toString().substring(1..last_symb - 2)
 
             val requestBody = """
@@ -283,7 +282,7 @@ class MainActivity : AppCompatActivity() {
                     println("API failed")
 
                     callback("К сожалению произошла ошибка(. Количество запросов не уменьшено")
-                    attemptsLeft = attemptsLeft + 1
+                    attemptsLeft += 1
                 }
 
                 override fun onResponse(call: Call, response: Response) {
@@ -296,17 +295,16 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val jsonObject = JSONObject(body)
                         val jsonArray = jsonObject.getJSONArray("choices")
-                       // println("JSON ARRAY: $jsonArray")
                         var test = jsonArray.getJSONObject(0)
-                        //println("TEST $test")
                         val message = test.getJSONObject("message")
                         val final_res = message.getString("content").toString()
-                       // println(final_res)
+
 
 
                         callback(final_res)
                     } catch (e: JSONException) {
                         println(body)
+                        println("HEADER "+ response.headers?.toString())
                         callback("К сожалению сервер сейчас недоступен. Попробуйте позже")
                     }
                 }
