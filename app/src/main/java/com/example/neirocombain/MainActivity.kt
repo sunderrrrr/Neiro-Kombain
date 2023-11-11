@@ -56,7 +56,6 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
         etQuestion=findViewById(R.id.request)
-
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
         val model = findViewById<TextView>(R.id.model)
@@ -260,11 +259,11 @@ class MainActivity : AppCompatActivity() {
             val requestBody = """
             {
                 "model": "gpt-3.5-turbo",
-                "messages": [$msg_req],
-                "temperature": 0.0
+                "messages": [$msg_req]
+               
             }
             """.trimIndent()
-
+            println("REQUESRT BODY"+requestBody)
 
             val request = Request.Builder()
                 .url(url)
@@ -297,15 +296,17 @@ class MainActivity : AppCompatActivity() {
                         val jsonArray = jsonObject.getJSONArray("choices")
                         var test = jsonArray.getJSONObject(0)
                         val message = test.getJSONObject("message")
-                        val final_res = message.getString("content").toString()
+                        val final_res = message.getString("content")
+                        val very_final = final_res.replace("\n", "")
 
 
 
-                        callback(final_res)
+                        callback(very_final)
                     } catch (e: JSONException) {
                         println(body)
                         println("HEADER "+ response.headers?.toString())
                         callback("К сожалению сервер сейчас недоступен. Попробуйте позже")
+                        attemptsLeft += 1
                     }
                 }
 
