@@ -35,8 +35,7 @@ import java.util.TimerTask
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
-import deepl.api.v2.DeepLClient
-import deepl.api.v2.model.translation.TargetLanguage
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -219,7 +218,7 @@ class MainActivity : AppCompatActivity() {
                     }
                         if (mode =="DALLE-E"){//DALL E
                             messageRV.visibility = View.GONE
-                            getResponse(question) { response ->
+                            getResponse(final_send) { response ->
                                 runOnUiThread {
 
                                     Toast.makeText(
@@ -357,66 +356,57 @@ class MainActivity : AppCompatActivity() {
             println("Отправляю запрос")
             val body = """
             {
-            "model": "dall-e-2",
+            "model": "dall-e-3",
             "prompt": "$question",
             "n": 1,
             "size": "256x256"
           }
-            """.trimIndent()
+            """
+          println(body)
 
-            val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
-            val request = Request.Builder()
 
-                .url("https://api.proxyapi.ru/openai/v1/images/generations")
-                .header("Content-Type", "application/json")
-                .addHeader("Authorization", "Bearer $apiKey")
-                .post(body.toRequestBody("application/json".toMediaTypeOrNull()))
-                .build()
+            val request = Request.Builder().url("https://api.proxyapi.ru/openai/v1/images/generations").header("Content-Type", "application/json").addHeader("Authorization", "Bearer sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9").post(body.toRequestBody()).build()
             println(request.toString())
 
 
 
             val executor = Executors.newSingleThreadExecutor()
-            executor.execute(Runnable {
-                client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    println("API failed")
 
-                    println(response.body!!)
-                    val resp = response.body?.string()
-
-                    val body_json = JSONObject(resp)
-                    println(body_json)
-
-
+                    callback("К сожалению произошла ошибка(. Количество запросов не уменьшено")
+                    attemptsLeft += 1
                 }
 
-                    fun onResponse(call: Call, response: Response) {
-                        val bodyy = response.body?.string()
-                        if (bodyy != null) {
-                            println("D3 $bodyy")
-                            println(bodyy.length.toInt())
-
-                        } else {
-                            println("D3 empty")
-                        }
-                        try {
-
-                            //val jsonArray = jsonObject.getJSONArray("choices")
-                           // println("JSON ARRAY: $jsonArray")
-                            //var test = jsonArray.getJSONObject(0)
-                            //println("TEST $test")
-                            //val message = test.getJSONObject("message")
-                            //val final_res = message.getString("content").toString()
-                            //println(final_res)
-
-
-                           // callback(final_res)
-                        } catch (e: JSONException) {
-                            callback("К сожалению сервер сейчас недоступен. Попробуйте позже")
-                        }
+                override fun onResponse(call: Call, response: Response) {
+                    val body = response.toString()
+                    println("D3 $body")
+                    if (body != null) {
+                        Log.v("data", body)
+                    } else {
+                        Log.v("data", "empty")
                     }
+                    try {
+                      /*  val jsonObject = JSONObject(body)
+                        val jsonArray = jsonObject.getJSONArray("choices")
+                        var test = jsonArray.getJSONObject(0)
+                        val message = test.getJSONObject("message")
+                        val final_res = message.getString("content")
+                        val very_final = final_res.replace("\n", "")
 
-                })
+
+
+                        callback(very_final)*/
+                    } catch (e: JSONException) {
+                        println(body)
+                        println("HEADER "+ response.headers?.toString())
+                        callback("К сожалению сервер сейчас недоступен. Попробуйте позже")
+                        attemptsLeft += 1
+                    }
+                }
+
+            })
             }
         //Конец DALLE-E
         if (mode=="DeepL"){
