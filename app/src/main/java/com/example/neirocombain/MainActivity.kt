@@ -320,7 +320,6 @@ class MainActivity : AppCompatActivity() {
             "model": "dall-e-2",
             "prompt": "$question",
             "n": 1,
-            "response_format": "url",
             "size": "256x256"
           }
             """.trimIndent()
