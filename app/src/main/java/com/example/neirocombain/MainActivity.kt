@@ -20,10 +20,11 @@ import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
+import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.banner.BannerAdView
-import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.common.AdRequest.*
 import com.yandex.mobile.ads.common.AdSize
+import com.yandex.mobile.ads.common.*
 import com.yandex.mobile.ads.common.MobileAds
 import com.yandex.mobile.ads.instream.MobileInstreamAds
 import okhttp3.Call
@@ -113,9 +114,11 @@ class MainActivity : AppCompatActivity() {
         MobileAds.enableLogging(true)
         val banner = findViewById<BannerAdView>(R.id.banner)
         banner.setAdUnitId("demo-banner-yandex")
-        //banner.setAdSize(AdSize.BANNER_320x50)
-        val adRequest = AdRequest.Builder().build()
+        banner.setAdSize(BannerAdSize.fixedSize(this, 320,50))
+        val adRequest = Builder().build()
+        println(adRequest)
         banner.loadAd(adRequest)
+        
         //КОНЕЦ БЛОКА РЕКЛАМЫ====================
 
 

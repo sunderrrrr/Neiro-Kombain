@@ -146,6 +146,7 @@
         android:layout_width="331dp"
         android:layout_height="73dp"
         android:layout_marginBottom="65dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/request"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
