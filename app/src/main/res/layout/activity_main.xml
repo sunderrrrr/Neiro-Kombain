@@ -8,20 +8,19 @@
     tools:context=".MainActivity">
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/main"
         android:layout_width="340dp"
         android:layout_height="520dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="180dp"
         android:orientation="vertical"
         android:verticalScrollbarPosition="right"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dropMenu"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15sp"
@@ -37,6 +36,7 @@
                 android:id="@+id/lang"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="#121212"
                 android:inputType="none"
                 android:text="Конечный язык" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -141,12 +141,24 @@
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
         app:layout_constraintVertical_bias="0.0" />
 
+    <com.yandex.mobile.ads.banner.BannerAdView
+        android:id="@+id/banner"
+        android:layout_width="331dp"
+        android:layout_height="73dp"
+        android:layout_marginBottom="65dp"
+        app:layout_constraintBottom_toTopOf="@+id/request"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main"
+        app:layout_constraintVertical_bias="0.0" />
+
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/request"
         style="@android:style/Widget.Holo.Light.EditText"
         android:layout_width="342dp"
         android:layout_height="54dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10sp"
         android:background="@drawable/corner"
         android:drawableEnd="@android:drawable/ic_menu_send"
         android:ems="10"
@@ -154,16 +166,16 @@
         android:hint="Запрос"
         android:imeOptions="actionSend"
         android:inputType="text"
-        android:paddingHorizontal="10sp"
+        android:paddingHorizontal="15sp"
         android:textAlignment="textStart"
         android:textColor="#FFFFFF"
         android:textColorHint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.529"
+        app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintVertical_bias="0.407"
+        app:layout_constraintTop_toBottomOf="@+id/main"
+        app:layout_constraintVertical_bias="0.875"
         tools:ignore="HardcodedText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
