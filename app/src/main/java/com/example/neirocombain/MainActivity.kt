@@ -55,7 +55,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var edittextval: String
     lateinit var messageRV: RecyclerView
     lateinit var messageRVAdapter: MessageRVAdapter
+    lateinit var DeepLAdapter: MessageRVAdapter
     lateinit var messageList: ArrayList<MessageRVModal>
+    lateinit var DeepLList: ArrayList<MessageRVModal>
 
     val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
@@ -65,6 +67,7 @@ class MainActivity : AppCompatActivity() {
     var mode = "ChatGPT"
     var selectedNl = 1
     var msgList_FNL = mutableListOf<String>()
+
     var selectedLang = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         //ИНИЦИАЛИЗАЦИЯ=========================================
@@ -81,10 +84,12 @@ class MainActivity : AppCompatActivity() {
         val mainLO = findViewById<LinearLayout>(R.id.main)
         txtResponse=findViewById(R.id.desc)
         messageList = ArrayList()
+        DeepLList = ArrayList()
         messageRV = findViewById(R.id.msgRV)
-        messageRVAdapter = MessageRVAdapter(messageList)
         val layoutManager = LinearLayoutManager(applicationContext)
         messageRV.layoutManager = layoutManager
+        println("ПЕРВИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА")
+        messageRVAdapter = MessageRVAdapter(messageList)
         messageRV.adapter = messageRVAdapter
         var isSended = false
         var langTV: AutoCompleteTextView?
@@ -96,6 +101,11 @@ class MainActivity : AppCompatActivity() {
             "ChatGPT",
             "DeepL",
         )
+        var isFirstGPT = true
+        var isFirstDeepL = true
+
+
+        //ВЫБОР ЯЗЫКОВ
         val languages = resources.getStringArray(R.array.lang_array)
         val arrayAdapter = ArrayAdapter(/* context = */ this, /* resource = */
             R.layout.dropdown_item, /* objects = */
@@ -103,7 +113,6 @@ class MainActivity : AppCompatActivity() {
         langTV.setAdapter(arrayAdapter)
         langTV.onItemClickListener= AdapterView.OnItemClickListener { adapterView, view, i, l ->
             selectedLang = adapterView.getItemAtPosition(i).toString()
-
         }
         //КОНЕЦ ИНИЦИАЛИЗАЦИИ=============================
 
@@ -128,16 +137,19 @@ class MainActivity : AppCompatActivity() {
             if (selectedNl==2) {
                 Timer().schedule(150) {
                     selectedNl = 1
-
+                    println("ВТОРИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА В ЖПТ")
                     mode = nLinks[selectedNl]
-
                     runOnUiThread {
                         model.alpha = 0f
                         mainLO.alpha = 0f
                         model.text = nLinks[selectedNl]
                         messageRV.visibility = View.VISIBLE
                         dropMenu.visibility = View.GONE
-                        txtResponse.visibility = View.GONE
+                        messageRVAdapter = MessageRVAdapter(messageList)
+                        messageRV.adapter = messageRVAdapter
+                        if(isFirstGPT==true){
+                        txtResponse.visibility = View.VISIBLE}
+                        else{txtResponse.visibility = View.GONE}
                         txtResponse.text =
                             "Что умеет ChatGPT: \n\n"+" 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
                         mainLO.animate().alpha(1f).setDuration(500)
@@ -188,75 +200,72 @@ class MainActivity : AppCompatActivity() {
                         model.alpha = 0f
                         model.text = nLinks[selectedNl]
                         dropMenu.visibility = View.VISIBLE
-                        messageRV.visibility = View.GONE
-                        txtResponse.visibility = View.VISIBLE
+                        if(isFirstDeepL==true){
+                            txtResponse.visibility = View.VISIBLE}
+                        else{txtResponse.visibility = View.GONE}
+                        println("ВТОРИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА В ДИПЛ")
+                        messageRVAdapter = MessageRVAdapter(DeepLList)
+                        messageRV.adapter = messageRVAdapter
                         txtResponse.text = "Что умеет DeepL: \n\n1.Автоматически обнажуривать язык источника\n\n 2.Понимает сленг и идиомы\n\n 3.Имеет при себе большую языковую базу \n\n 4.Более точный перевод с помощью нейросетей"
                         mainLO.animate().alpha(1f).setDuration(500)
                         model.animate().alpha(1f).setDuration(500)
                     }
                 }
             }
-
             if (selectedNl == 0) {
                 Timer().schedule(150) {
                     selectedNl = 1
-
                     mode = nLinks[selectedNl]
-
                     runOnUiThread {
                         mainLO.alpha = 0f
                         model.alpha = 0f
-                            model.text = nLinks[selectedNl]
-                            messageRV.visibility = View.VISIBLE
-                            txtResponse.visibility = View.GONE
-                            txtResponse.text =
+                        model.text = nLinks[selectedNl]
+                        messageRV.visibility = View.VISIBLE
+                        txtResponse.visibility = View.GONE
+                        messageRVAdapter=MessageRVAdapter(messageList)
+                        messageRV.adapter=messageRVAdapter
+                        if(isFirstGPT==true){
+                            txtResponse.visibility = View.VISIBLE}
+                        else{txtResponse.visibility = View.GONE}
+                        txtResponse.text =
                                 "Что умеет ChatGPT: \n\n" + " 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
                         mainLO.animate().setDuration(1000).alpha(1f)
                         model.animate().alpha(1f).setDuration(500)
                     }
-
-
                 }
             }
-
         }
         //КОНЕЦ КНОПОК НАВИГАЦИИ================================
-        //Блок отправки сообщений
+
+
+
+
+        //Блок отправки сообщений========================
         etQuestion.setOnEditorActionListener(OnEditorActionListener{ textView, i, keyEvent ->
             if (i==EditorInfo.IME_ACTION_SEND){
-                val final_send = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
-                println(msgList_FNL)
-                edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
-                val question = edittextval.replace(" ","")
-                //Toast.makeText(this,question, Toast.LENGTH_SHORT).show()
+                val final_send=etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
+                edittextval=etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
+                val question=edittextval.replace(" ","")
                 if (attemptsLeft > 0) {
                     txtResponse.visibility = View.GONE
                     messageRV.visibility = View.VISIBLE
                     if (question.isNotEmpty() && question.length >= 5 && isSended == false) {
                         if (mode == "ChatGPT"){
                             val user_mask = """{"role": "user", "content" :"$final_send"}"""
-
-                            msgList_FNL.add(user_mask)
-                            messageList.add(MessageRVModal(final_send
-                                ,"user"))
-
+                            msgList_FNL.add(user_mask) //Сообщение для апи
+                            messageList.add(MessageRVModal(final_send,"user"))//Сообщение для чата
                             messageRVAdapter.notifyDataSetChanged()
-                            isSended = true
-                        etQuestion.setText("")
+                            isSended=true
+                            isFirstGPT=false
+                            etQuestion.setText("")
                             messageList.add(MessageRVModal("Печатает...", "bot"))
-
-
                         //Отправляем строку в функцию
                         getResponse(question) { response ->
                             runOnUiThread {
                                 messageRV.visibility = View.VISIBLE
                                 messageList.removeLast()
                                 val response_to_list = response.replace("\n","")
-                                messageList.add(
-                                    MessageRVModal(
-                                        response, "bot"
-                                    )
-                                )
+                                messageList.add(MessageRVModal(response, "bot"))
                                 messageRVAdapter.run { notifyDataSetChanged() }
                                 println("МАССИВ $messageList")
                                 val nl_mask = """{"role": "assistant", "content" :"$response_to_list"}"""
@@ -264,9 +273,8 @@ class MainActivity : AppCompatActivity() {
                                 //println(msgList_FNL)
                                 attemptsLeft -= 1
                                 attempts_text.text = "$attemptsLeft/15"
-
-
                             }
+                            //КОНЕЦ UI ПОТОКА
                         }
                         isSended = false
                     }
@@ -274,13 +282,7 @@ class MainActivity : AppCompatActivity() {
                             messageRV.visibility = View.GONE
                             getResponse(final_send) { response ->
                                 runOnUiThread {
-
-                                    Toast.makeText(
-                                        applicationContext,
-                                        "Dalle-2",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-
+                                    Toast.makeText(applicationContext, "Dalle-2", Toast.LENGTH_SHORT).show()
                                     attemptsLeft = attemptsLeft - 1
                                     attempts_text.text = "$attemptsLeft/15"
 
@@ -289,15 +291,27 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                         if (mode=="DeepL"){
-                            messageRV.visibility=View.GONE
+                            txtResponse.visibility = View.GONE
+                            isFirstDeepL=false
+                            messageRV.visibility=View.VISIBLE
+                            DeepLList.add(MessageRVModal(final_send,"user"))
+                            messageRVAdapter.run { notifyDataSetChanged() }
+                            DeepLList.add(MessageRVModal("Печатает...", "bot"))
                             getResponse(final_send) { response ->
                                 runOnUiThread {
-                                    txtResponse.visibility = View.VISIBLE
-                                    txtResponse.text= "Ваш запрос $final_send. \n\nПеревод: $response"
+                                    println(response)
+                                    println("ОТВЕТ ПОЛУЧЕН")
+                                    DeepLList.removeLast()
+                                    DeepLList.add(
+                                        MessageRVModal(
+                                            response, "bot"
+                                        )
+                                    )
+                                    println(DeepLList)
                                     attemptsLeft -= 1
                                     attempts_text.text = "$attemptsLeft/15"
 
-
+                                    messageRVAdapter.notifyDataSetChanged()
                                 }
                             }
                         }
@@ -387,10 +401,6 @@ class MainActivity : AppCompatActivity() {
                         var test = jsonArray.getJSONObject(0)
                         val message = test.getJSONObject("message")
                         val final_res = message.getString("content")
-
-
-
-
                         callback(final_res)
                     } catch (e: JSONException) {
                         println(body)
@@ -464,9 +474,6 @@ class MainActivity : AppCompatActivity() {
                
             }
             """.trimIndent()
-
-            println("REQUESRT BODY"+requestBody)
-
             val request = Request.Builder()
                 .url(url)
                 .addHeader("Content-Type", "application/json")
@@ -503,7 +510,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-                        callback(very_final)
+                        callback(final_res)
                     } catch (e: JSONException) {
                         println(body)
                         println("HEADER "+ response.headers?.toString())
