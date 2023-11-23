@@ -412,9 +412,8 @@ class MainActivity : AppCompatActivity() {
 
             })
         }
-        //Конец ChatGPT
+        //Конец ChatGPT=======================================================================
         if (mode == "DALLE-E") {
-
             println("Отправляю запрос")
             val body = """
             {
@@ -423,24 +422,17 @@ class MainActivity : AppCompatActivity() {
             "n": 1,
             "size": "256x256"
           }
-            """
+            """.trimIndent()
           println(body)
-
-
             val request = Request.Builder().url("https://api.proxyapi.ru/openai/v1/images/generations").header("Content-Type", "application/json").addHeader("Authorization", "Bearer sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9").post(body.toRequestBody()).build()
             println(request.toString())
-
-
-
-            val executor = Executors.newSingleThreadExecutor()
+            //val executor = Executors.newSingleThreadExecutor()
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     println("API failed")
-
                     callback("К сожалению произошла ошибка(. Количество запросов не уменьшено")
                     attemptsLeft += 1
                 }
-
                 override fun onResponse(call: Call, response: Response) {
                     val body = response.toString()
                     println("D3 $body")
@@ -461,7 +453,7 @@ class MainActivity : AppCompatActivity() {
 
             })
             }
-        //Конец DALLE-E
+        //Конец DALLE-E============================================================================
         if (mode=="DeepL"){
             val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
             val url = "https://api.proxyapi.ru/openai/v1/chat/completions"
