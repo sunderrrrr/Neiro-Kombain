@@ -4,11 +4,13 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.LinearLayout
+import com.yandex.mobile.ads.common.MobileAds
 
 @Suppress("DEPRECATION")
 class SplashScreen : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MobileAds.initialize(this) {}
         setContentView(R.layout.activity_splash_screen)
         val logo_LO = findViewById<LinearLayout>(R.id.Logo_lay)
         logo_LO.alpha = 0f

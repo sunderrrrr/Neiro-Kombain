@@ -9,8 +9,8 @@
 
     <LinearLayout
         android:id="@+id/main"
-        android:layout_width="340dp"
-        android:layout_height="520dp"
+        android:layout_width="344dp"
+        android:layout_height="486dp"
         android:layout_marginTop="180dp"
         android:orientation="vertical"
         android:verticalScrollbarPosition="right"
@@ -83,6 +83,19 @@
 
     </LinearLayout>
 
+    <com.yandex.mobile.ads.banner.BannerAdView
+        android:id="@+id/banner"
+        android:layout_width="420dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="24dp"
+        android:background="#FFFFFF"
+        android:paddingStart="50sp"
+        app:layout_constraintBottom_toTopOf="@+id/request"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main"
+        app:layout_constraintVertical_bias="0.666" />
+
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="319dp"
@@ -140,18 +153,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <com.yandex.mobile.ads.banner.BannerAdView
-        android:id="@+id/banner"
-        android:layout_width="331dp"
-        android:layout_height="73dp"
-        android:layout_marginBottom="65dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/request"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main"
         app:layout_constraintVertical_bias="0.0" />
 
     <com.google.android.material.textfield.TextInputEditText

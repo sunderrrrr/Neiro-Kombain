@@ -2,6 +2,7 @@ package com.example.neirocombain
 
 
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -80,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
         val model = findViewById<TextView>(R.id.model)
+        val banner = findViewById<BannerAdView>(R.id.banner)
         val attempts_text = findViewById<TextView>(R.id.attemts)
         val mainLO = findViewById<LinearLayout>(R.id.main)
         txtResponse=findViewById(R.id.desc)
@@ -118,16 +120,21 @@ class MainActivity : AppCompatActivity() {
 
 
         //БЛОК РЕКЛАМЫ===========================
-        MobileAds.initialize(this) {}
+        MobileAds.initialize(this){
         MobileInstreamAds.setAdGroupPreloading(true)
         MobileAds.enableLogging(true)
-        val banner = findViewById<BannerAdView>(R.id.banner)
         banner.setAdUnitId("demo-banner-yandex")
-        banner.setAdSize(BannerAdSize.fixedSize(this, 320,50))
-        val adRequest = Builder().build()
+        banner.setAdSize(BannerAdSize.fixedSize(this, 320, 70))
+            val adRequest: AdRequest = Builder().build()
         println(adRequest)
-        banner.loadAd(adRequest)
-        
+        banner.run {
+            println(adRequest)
+            loadAd(adRequest)
+        }
+        }
+        banner.setOnClickListener {
+            println("Я ТУТ")
+        }
         //КОНЕЦ БЛОКА РЕКЛАМЫ====================
 
 
