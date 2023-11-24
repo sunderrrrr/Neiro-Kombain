@@ -63,7 +63,8 @@
             android:layout_width="match_parent"
             android:layout_height="62dp"
             android:layout_marginTop="40sp"
-            android:progressTint="#FFFFFF" />
+            android:progressTint="#FFFFFF"
+            android:visibility="visible" />
 
     </LinearLayout>
 
