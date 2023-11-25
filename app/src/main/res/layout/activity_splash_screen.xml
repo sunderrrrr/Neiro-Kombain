@@ -9,8 +9,8 @@
 
     <LinearLayout
         android:id="@+id/Logo_lay"
-        android:layout_width="388dp"
-        android:layout_height="229dp"
+        android:layout_width="387dp"
+        android:layout_height="254dp"
         android:layout_marginTop="282dp"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="390dp"
@@ -52,10 +52,19 @@
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Neiro/Kombain "
+            android:text="Neiro/Kombain"
             android:textAlignment="center"
             android:textColor="#FFFFFF"
             android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="A1"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
 
         <ProgressBar
             android:id="@+id/progressBar"

@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         val banner = findViewById<BannerAdView>(R.id.banner)
         val attempts_text = findViewById<TextView>(R.id.attemts)
         val mainLO = findViewById<LinearLayout>(R.id.main)
+        val image = findViewById<ImageView>(R.id.image)
         txtResponse=findViewById(R.id.desc)
         messageList = ArrayList()
         DeepLList = ArrayList()
@@ -129,12 +130,8 @@ class MainActivity : AppCompatActivity() {
         println(adRequest)
         banner.run {
             println(adRequest)
-            loadAd(adRequest)
-        }
-        }
-        banner.setOnClickListener {
-            println("Я ТУТ")
-        }
+            loadAd(adRequest) } }
+        banner.setOnClickListener { println("Я ТУТ") }
         //КОНЕЦ БЛОКА РЕКЛАМЫ====================
 
 
@@ -157,6 +154,7 @@ class MainActivity : AppCompatActivity() {
                         if(isFirstGPT==true){
                         txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
+                        image.visibility=View.GONE
                         txtResponse.text =
                             "Что умеет ChatGPT: \n\n"+" 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
                         mainLO.animate().alpha(1f).setDuration(500)
@@ -176,6 +174,9 @@ class MainActivity : AppCompatActivity() {
                         txtResponse.visibility = View.VISIBLE
                         txtResponse.text =
                             "Что умеет Dall-e 2:\n\n Может нарисовать картинку по вашему текстовому запросу в разрешении 512*512 пикселей. \n Фотореализм, аниме, краски итд. \n\nСценарии применения:\n Референсы для творческих работ, обложка альбома, обои и так далее"
+                        dropMenu.visibility= View.GONE
+                        image.visibility=View.VISIBLE
+
                         mainLO.animate().alpha(1f).setDuration(500)
                         model.animate().alpha(1f).setDuration(500)
                     }
@@ -213,6 +214,7 @@ class MainActivity : AppCompatActivity() {
                         println("ВТОРИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА В ДИПЛ")
                         messageRVAdapter = MessageRVAdapter(DeepLList)
                         messageRV.adapter = messageRVAdapter
+                        image.visibility=View.GONE
                         txtResponse.text = "Что умеет DeepL: \n\n1.Автоматически обнажуривать язык источника\n\n 2.Понимает сленг и идиомы\n\n 3.Имеет при себе большую языковую базу \n\n 4.Более точный перевод с помощью нейросетей"
                         mainLO.animate().alpha(1f).setDuration(500)
                         model.animate().alpha(1f).setDuration(500)
@@ -234,6 +236,7 @@ class MainActivity : AppCompatActivity() {
                         if(isFirstGPT==true){
                             txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
+                        image.visibility=View.GONE
                         txtResponse.text =
                                 "Что умеет ChatGPT: \n\n" + " 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
                         mainLO.animate().setDuration(1000).alpha(1f)
@@ -287,7 +290,8 @@ class MainActivity : AppCompatActivity() {
                     }
                         if (mode =="DALLE-E"){//DALL E
                             messageRV.visibility = View.GONE
-                            getResponse(final_send) { response ->
+                            Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT).show()
+                                /*getResponse(final_send) { response ->
                                 runOnUiThread {
                                     Toast.makeText(applicationContext, "Dalle-2", Toast.LENGTH_SHORT).show()
                                     attemptsLeft = attemptsLeft - 1
@@ -295,7 +299,7 @@ class MainActivity : AppCompatActivity() {
 
 
                                 }
-                            }
+                            }*/
                         }
                         if (mode=="DeepL"){
                             txtResponse.visibility = View.GONE
