@@ -20,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.material.textfield.TextInputLayout
 import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.banner.BannerAdView
@@ -28,6 +30,7 @@ import com.yandex.mobile.ads.common.AdSize
 import com.yandex.mobile.ads.common.*
 import com.yandex.mobile.ads.common.MobileAds
 import com.yandex.mobile.ads.instream.MobileInstreamAds
+import com.yandex.mobile.ads.rewarded.RewardedAd
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -345,10 +348,10 @@ class MainActivity : AppCompatActivity() {
 
                     }
                 }
-                else{
+                else if (attemptsLeft ==0){
                     Toast.makeText(
                         applicationContext,
-                        "Количество попыток исчерпано. Посмотрите рекламу или приходите завтра",
+                        "Количество запросов исчерпано",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
