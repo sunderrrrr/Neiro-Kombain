@@ -28,9 +28,12 @@
 
 
             android:layout_marginEnd="15sp"
+            android:textColorHint="#FFFFFF"
             android:visibility="invisible"
             app:boxStrokeWidth="0.5dp"
-            app:boxStrokeWidthFocused="1dp">
+            app:boxStrokeWidthFocused="1dp"
+            app:hintTextColor="#FFFFFF"
+            app:prefixTextColor="#FFFFFF">
 
 
             <AutoCompleteTextView
@@ -54,7 +57,7 @@
             android:breakStrategy="high_quality"
             android:fontFamily="sans-serif"
             android:overScrollMode="always"
-            android:paddingTop="80sp"
+            android:paddingTop="40sp"
             android:scrollIndicators="right"
             android:scrollbarAlwaysDrawVerticalTrack="true"
             android:scrollbars="vertical"
@@ -65,7 +68,7 @@
             android:textColor="#FFFFFF"
             android:textColorHint="#FFFFFF"
             android:textIsSelectable="true"
-            android:textSize="20sp"
+            android:textSize="21sp"
             android:verticalScrollbarPosition="right"
             android:visibility="visible" />
 
@@ -91,7 +94,7 @@
 
     <com.yandex.mobile.ads.banner.BannerAdView
         android:id="@+id/banner"
-        android:layout_width="420dp"
+        android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_marginBottom="50sp"
         android:background="#FFFFFF"
@@ -169,7 +172,7 @@
         android:layout_width="342dp"
         android:layout_height="54dp"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="15sp"
+        android:layout_marginBottom="25dp"
         android:background="@drawable/corner"
         android:drawableEnd="@android:drawable/ic_menu_send"
         android:ems="10"
