@@ -46,7 +46,9 @@ import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
+import java.time.DayOfWeek
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Timer
 import java.util.TimerTask
@@ -55,7 +57,7 @@ import kotlin.concurrent.schedule
 
 
 class MainActivity : AppCompatActivity() {
-
+    var DEBUG_MODE = false//ВЫКЛ ВКЛ ДЕБАГ
     lateinit var txtResponse: TextView
     private var rewardedAd: RewardedAd? = null
     private var rewardedAdLoader: RewardedAdLoader? = null
@@ -73,46 +75,36 @@ class MainActivity : AppCompatActivity() {
     var selectedLang = ""
     var pref: SharedPreferences? = null
     var attemptsLeft: Int = 0
-    override fun onCreate(savedInstanceState: Bundle?) {
 
+    override fun onCreate(savedInstanceState: Bundle?) {
         //ИНИЦИАЛИЗАЦИЯ=========================================
         super.onCreate(savedInstanceState)
-        //WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
         etQuestion=findViewById(R.id.request)
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
         val model = findViewById<TextView>(R.id.model)
         val banner = findViewById<BannerAdView>(R.id.banner)
-        attempts_text = findViewById(R.id.attemts)
+        val layoutManager = LinearLayoutManager(applicationContext)
         val mainLO = findViewById<LinearLayout>(R.id.main)
         val image = findViewById<ImageView>(R.id.image)
+        val langTV = findViewById<AutoCompleteTextView>(R.id.lang)
+        val dropMenu = findViewById<TextInputLayout>(R.id.dropMenu)
         txtResponse=findViewById(R.id.desc)
-        messageList = ArrayList()
-        DeepLList = ArrayList()
+        attempts_text = findViewById(R.id.attemts)
         messageRV = findViewById(R.id.msgRV)
         pref = getSharedPreferences("shared", Context.MODE_PRIVATE)
         attemptsLeft = pref?.getInt("attempts", 5)!!
         attempts_text.text = attemptsLeft.toString() +"/5"
-        val layoutManager = LinearLayoutManager(applicationContext)
+        messageList = ArrayList()
+        DeepLList = ArrayList()
         messageRV.layoutManager = layoutManager
-        println("ПЕРВИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА")
         messageRVAdapter = MessageRVAdapter(messageList)
         messageRV.adapter = messageRVAdapter
         var isSended = false
-        var langTV: AutoCompleteTextView?
-        val dropMenu = findViewById<TextInputLayout>(R.id.dropMenu)
-        dropMenu.visibility = View.GONE
-        langTV = findViewById(R.id.lang)
-        val nLinks = listOf(
-            "DALLE-E",
-            "ChatGPT",
-            "DeepL",
-        )
+        val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL",)
         var isFirstGPT = true
         var isFirstDeepL = true
-
-
         //ВЫБОР ЯЗЫКОВ
         val languages = resources.getStringArray(R.array.lang_array)
         val arrayAdapter = ArrayAdapter(/* context = */ this, /* resource = */ R.layout.dropdown_item, /* objects = */ languages)
@@ -120,10 +112,10 @@ class MainActivity : AppCompatActivity() {
         langTV.onItemClickListener= AdapterView.OnItemClickListener { adapterView, view, i, l ->
             selectedLang = adapterView.getItemAtPosition(i).toString()
         }
-        //КОНЕЦ ИНИЦИАЛИЗАЦИИ=============================
+        dropMenu.visibility = View.GONE
+        //КОНЕЦ ИНИЦИАЛИЗАЦИИ===================================================
 
-
-        //БЛОК РЕКЛАМЫ===========================
+        //БЛОК РЕКЛАМЫ===========================================================
         rewardedAdLoader = RewardedAdLoader(this).apply {
             setAdLoadListener(object : RewardedAdLoadListener {
                 override fun onAdLoaded(rewardedAd: RewardedAd) {
@@ -303,7 +295,7 @@ class MainActivity : AppCompatActivity() {
 
         //Блок отправки сообщений========================
         etQuestion.setOnEditorActionListener(OnEditorActionListener{ textView, i, keyEvent ->
-            if (i==EditorInfo.IME_ACTION_SEND) {
+            if (i==EditorInfo.IME_ACTION_SEND && DEBUG_MODE == false) {
                 val final_send =
                     etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
@@ -398,8 +390,12 @@ class MainActivity : AppCompatActivity() {
                     showAd()
                 }
             }
-            else{
-                println("123")
+            if (DEBUG_MODE){
+                Toast.makeText(
+                    applicationContext,
+                    "Эта версия предназначена для проверки дизайна и не имеет функционала",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         false
         })
