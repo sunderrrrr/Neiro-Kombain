@@ -2,7 +2,6 @@ package com.example.neirocombain
 
 
 
-import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,17 +19,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.google.android.material.textfield.TextInputLayout
 import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.banner.BannerAdView
-import com.yandex.mobile.ads.common.AdRequest.*
-import com.yandex.mobile.ads.common.AdSize
-import com.yandex.mobile.ads.common.*
+import com.yandex.mobile.ads.common.AdError
+import com.yandex.mobile.ads.common.AdRequest
+import com.yandex.mobile.ads.common.AdRequest.Builder
+import com.yandex.mobile.ads.common.AdRequestConfiguration
+import com.yandex.mobile.ads.common.AdRequestError
+import com.yandex.mobile.ads.common.ImpressionData
 import com.yandex.mobile.ads.common.MobileAds
 import com.yandex.mobile.ads.instream.MobileInstreamAds
+import com.yandex.mobile.ads.interstitial.InterstitialAd
+import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
+import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
+import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
+import com.yandex.mobile.ads.rewarded.Reward
 import com.yandex.mobile.ads.rewarded.RewardedAd
+import com.yandex.mobile.ads.rewarded.RewardedAdEventListener
+import com.yandex.mobile.ads.rewarded.RewardedAdLoadListener
+import com.yandex.mobile.ads.rewarded.RewardedAdLoader
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -40,29 +48,31 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
+import org.w3c.dom.Text
 import java.io.IOException
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.Timer
 import java.util.TimerTask
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 
 
-
 class MainActivity : AppCompatActivity() {
-    var attemptsLeft = 15
+    var attemptsLeft = 5
     // creating variables on below line.
+    var interstitialAd: InterstitialAd? = null
+    var interstitialAdLoader: InterstitialAdLoader? = null
     lateinit var txtResponse: TextView
+    private var rewardedAd: RewardedAd? = null
+    private var rewardedAdLoader: RewardedAdLoader? = null
     lateinit var etQuestion: EditText
+    lateinit var attempts_text: TextView
     lateinit var edittextval: String
     lateinit var messageRV: RecyclerView
     lateinit var messageRVAdapter: MessageRVAdapter
-    lateinit var DeepLAdapter: MessageRVAdapter
     lateinit var messageList: ArrayList<MessageRVModal>
     lateinit var DeepLList: ArrayList<MessageRVModal>
-
     val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(10, TimeUnit.SECONDS)
@@ -71,12 +81,9 @@ class MainActivity : AppCompatActivity() {
     var mode = "ChatGPT"
     var selectedNl = 1
     var msgList_FNL = mutableListOf<String>()
-
     var selectedLang = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         //ИНИЦИАЛИЗАЦИЯ=========================================
-
-
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
@@ -85,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         val right_btn = findViewById<ImageView>(R.id.rightarr)
         val model = findViewById<TextView>(R.id.model)
         val banner = findViewById<BannerAdView>(R.id.banner)
-        val attempts_text = findViewById<TextView>(R.id.attemts)
+        attempts_text = findViewById(R.id.attemts)
         val mainLO = findViewById<LinearLayout>(R.id.main)
         val image = findViewById<ImageView>(R.id.image)
         txtResponse=findViewById(R.id.desc)
@@ -124,10 +131,24 @@ class MainActivity : AppCompatActivity() {
 
 
         //БЛОК РЕКЛАМЫ===========================
+        rewardedAdLoader = RewardedAdLoader(this).apply {
+            setAdLoadListener(object : RewardedAdLoadListener {
+                override fun onAdLoaded(rewardedAd: RewardedAd) {
+                    this@MainActivity.rewardedAd = rewardedAd
+                    // The ad was loaded successfully. Now you can show loaded ad.
+                }
+
+                override fun onAdFailedToLoad(adRequestError: AdRequestError) {
+                    // Ad failed to load with AdRequestError.
+                    // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
+                }
+            })
+        }
+        loadRewardedAd()
         MobileAds.initialize(this){
         MobileInstreamAds.setAdGroupPreloading(true)
         MobileAds.enableLogging(true)
-        banner.setAdUnitId("demo-banner-yandex")
+        banner.setAdUnitId("R-M-4088559-1")// BANER
         banner.setAdSize(BannerAdSize.fixedSize(this, 320, 70))
             val adRequest: AdRequest = Builder().build()
         println(adRequest)
@@ -255,46 +276,49 @@ class MainActivity : AppCompatActivity() {
 
         //Блок отправки сообщений========================
         etQuestion.setOnEditorActionListener(OnEditorActionListener{ textView, i, keyEvent ->
-            if (i==EditorInfo.IME_ACTION_SEND){
-                val final_send=etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
-                edittextval=etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
-                val question=edittextval.replace(" ","")
+            if (i==EditorInfo.IME_ACTION_SEND) {
+                val final_send =
+                    etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
+                edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
+                val question = edittextval.replace(" ", "")
                 if (attemptsLeft > 0) {
                     txtResponse.visibility = View.GONE
                     messageRV.visibility = View.VISIBLE
                     if (question.isNotEmpty() && question.length >= 5 && isSended == false) {
-                        if (mode == "ChatGPT"){
+                        if (mode == "ChatGPT") {
                             val user_mask = """{"role": "user", "content" :"$final_send"}"""
                             msgList_FNL.add(user_mask) //Сообщение для апи
-                            messageList.add(MessageRVModal(final_send,"user"))//Сообщение для чата
+                            messageList.add(MessageRVModal(final_send, "user"))//Сообщение для чата
                             messageRVAdapter.notifyDataSetChanged()
-                            isSended=true
-                            isFirstGPT=false
+                            isSended = true
+                            isFirstGPT = false
                             etQuestion.setText("")
                             messageList.add(MessageRVModal("Печатает...", "bot"))
-                        //Отправляем строку в функцию
-                        getResponse(question) { response ->
-                            runOnUiThread {
-                                messageRV.visibility = View.VISIBLE
-                                messageList.removeLast()
-                                val response_to_list = response.replace("\n","")
-                                messageList.add(MessageRVModal(response, "bot"))
-                                messageRVAdapter.run { notifyDataSetChanged() }
-                                println("МАССИВ $messageList")
-                                val nl_mask = """{"role": "assistant", "content" :"$response_to_list"}"""
-                                msgList_FNL.add(nl_mask)
-                                //println(msgList_FNL)
-                                attemptsLeft -= 1
-                                attempts_text.text = "$attemptsLeft/15"
+                            //Отправляем строку в функцию
+                            getResponse(question) { response ->
+                                runOnUiThread {
+                                    messageRV.visibility = View.VISIBLE
+                                    messageList.removeLast()
+                                    val response_to_list = response.replace("\n", "")
+                                    messageList.add(MessageRVModal(response, "bot"))
+                                    messageRVAdapter.run { notifyDataSetChanged() }
+                                    println("МАССИВ $messageList")
+                                    val nl_mask =
+                                        """{"role": "assistant", "content" :"$response_to_list"}"""
+                                    msgList_FNL.add(nl_mask)
+                                    //println(msgList_FNL)
+                                    attemptsLeft -= 1
+                                    attempts_text.text = "$attemptsLeft/5"
+                                }
+                                //КОНЕЦ UI ПОТОКА
                             }
-                            //КОНЕЦ UI ПОТОКА
+                            isSended = false
                         }
-                        isSended = false
-                    }
-                        if (mode =="DALLE-E"){//DALL E
+                        if (mode == "DALLE-E") {//DALL E
                             messageRV.visibility = View.GONE
-                            Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT).show()
-                                /*getResponse(final_send) { response ->
+                            Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT)
+                                .show()
+                            /*getResponse(final_send) { response ->
                                 runOnUiThread {
                                     Toast.makeText(applicationContext, "Dalle-2", Toast.LENGTH_SHORT).show()
                                     attemptsLeft = attemptsLeft - 1
@@ -304,11 +328,11 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }*/
                         }
-                        if (mode=="DeepL"){
+                        if (mode == "DeepL") {
                             txtResponse.visibility = View.GONE
-                            isFirstDeepL=false
-                            messageRV.visibility=View.VISIBLE
-                            DeepLList.add(MessageRVModal(final_send,"user"))
+                            isFirstDeepL = false
+                            messageRV.visibility = View.VISIBLE
+                            DeepLList.add(MessageRVModal(final_send, "user"))
                             messageRVAdapter.run { notifyDataSetChanged() }
                             DeepLList.add(MessageRVModal("Печатает...", "bot"))
                             getResponse(final_send) { response ->
@@ -323,14 +347,13 @@ class MainActivity : AppCompatActivity() {
                                     )
                                     println(DeepLList)
                                     attemptsLeft -= 1
-                                    attempts_text.text = "$attemptsLeft/15"
+                                    attempts_text.text = "$attemptsLeft/5"
 
                                     messageRVAdapter.notifyDataSetChanged()
                                 }
                             }
                         }
-                }
-                    else {
+                    } else {
                         if (isSended == true) {
                             Toast.makeText(
                                 applicationContext,
@@ -348,13 +371,17 @@ class MainActivity : AppCompatActivity() {
 
                     }
                 }
-                else if (attemptsLeft ==0){
+                if (attemptsLeft == 0) {
                     Toast.makeText(
                         applicationContext,
-                        "Количество запросов исчерпано",
+                        "Количество запросов исчерпано. После воспроизведения рекламы они восстановятся",
                         Toast.LENGTH_SHORT
                     ).show()
+
+                    showAd()
                 }
+
+
 
             }
             else{
@@ -398,7 +425,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onFailure(call: Call, e: IOException) {
                     println("API failed")
 
-                    callback("К сожалению произошла ошибка(. Количество запросов не уменьшено")
+                    callback("К сожалению произошла ошибка. Проверьте соединение с интернетом или попробуйте позже. Количество запросов не уменьшено")
                     attemptsLeft += 1
                 }
 
@@ -419,7 +446,7 @@ class MainActivity : AppCompatActivity() {
                     } catch (e: JSONException) {
                         println(body)
                         println("HEADER "+ response.headers?.toString())
-                        callback("К сожалению сервер сейчас недоступен. Попробуйте позже")
+                        callback("К сожалению сервер сейчас недоступен. Количество запросов не уменьшено")
                         attemptsLeft += 1
                     }
                 }
@@ -444,7 +471,7 @@ class MainActivity : AppCompatActivity() {
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     println("API failed")
-                    callback("К сожалению произошла ошибка(. Количество запросов не уменьшено")
+                    callback("К сожалению произошла ошибка. Количество запросов не уменьшено")
                     attemptsLeft += 1
                 }
                 override fun onResponse(call: Call, response: Response) {
@@ -460,7 +487,7 @@ class MainActivity : AppCompatActivity() {
                     } catch (e: JSONException) {
                         println(body)
                         println("HEADER "+ response.headers?.toString())
-                        callback("К сожалению сервер сейчас недоступен. Попробуйте позже")
+                        callback("К сожалению сервер сейчас недоступен. Проверьте соединение с интернетом или попробуйте позже")
                         attemptsLeft += 1
                     }
                 }
@@ -533,11 +560,56 @@ class MainActivity : AppCompatActivity() {
         //Конец DeepL
         }
         //КОНЕЦ ОТПРАВКИ ЗАПРОСОВ К АПИ===========================================================
+        private fun loadRewardedAd() {
+            val adRequestConfiguration = AdRequestConfiguration.Builder("R-M-4088559-2").build()
+            rewardedAdLoader?.loadAd(adRequestConfiguration)
+        }
+       private fun showAd() {
+           rewardedAd?.apply {
+               setAdEventListener(object : RewardedAdEventListener {
+                   override fun onAdShown() {
+                       // Called when ad is shown.
+                   }
 
+                   override fun onAdFailedToShow(adError: AdError) {
+                       // Called when an RewardedAd failed to show
+                   }
+
+                   override fun onAdDismissed() {
+                       // Called when ad is dismissed.
+                       // Clean resources after Ad dismissed
+                       rewardedAd?.setAdEventListener(null)
+                       rewardedAd = null
+
+                       // Now you can preload the next rewarded ad.
+                       loadRewardedAd()
+                   }
+
+                   override fun onAdClicked() {
+                       // Called when a click is recorded for an ad.
+                   }
+
+                   override fun onAdImpression(impressionData: ImpressionData?) {
+                       // Called when an impression is recorded for an ad.
+                   }
+
+                   override fun onRewarded(reward: Reward) {
+                       // Called when the user can be rewarded.
+                       attemptsLeft = 5
+                       attempts_text.text = "$attemptsLeft/5"
+                   }
+               })
+               show(this@MainActivity)
+           }
 
     }
-//КОНЕЦ MAIN ACTIVITY==================================================================================
-    fun resetAttempts() {
+
+
+
+//КОНЦ MAIN ACTIVITY==================================================================================
+
+
+fun resetAttempts() {
         val now = LocalDateTime.now()
         val tomorrow = now.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
         val duration = Duration.between(now, tomorrow)
@@ -548,7 +620,7 @@ class MainActivity : AppCompatActivity() {
                 println("Количество попыток восстановлено.")
             }
         }, secondsUntilTomorrow * 1000)
-    }
+    }}
 
 
 
