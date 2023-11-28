@@ -57,6 +57,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 
 
+
 class MainActivity : AppCompatActivity() {
     var DEBUG_MODE = false//ВЫКЛ ВКЛ ДЕБАГ
     lateinit var txtResponse: TextView
@@ -76,7 +77,8 @@ class MainActivity : AppCompatActivity() {
     var selectedLang = ""
     var pref: SharedPreferences? = null
     var attemptsLeft: Int = 0
-
+    val Update = UpdateCheck()
+    var was_recently_seen = false
     override fun onCreate(savedInstanceState: Bundle?) {
         //ИНИЦИАЛИЗАЦИЯ=========================================
         super.onCreate(savedInstanceState)
@@ -96,6 +98,7 @@ class MainActivity : AppCompatActivity() {
         messageRV = findViewById(R.id.msgRV)
         pref = getSharedPreferences("shared", Context.MODE_PRIVATE)
         attemptsLeft = pref?.getInt("attempts", 5)!!
+        was_recently_seen = pref?.getBoolean("wrs", false)!!
         attempts_text.text = attemptsLeft.toString() +"/5"
         messageList = ArrayList()
         DeepLList = ArrayList()
@@ -106,12 +109,11 @@ class MainActivity : AppCompatActivity() {
         val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL",)
         var isFirstGPT = true
         var isFirstDeepL = true
-
         val now = LocalDate.now()
-            if(now.dayOfWeek == DayOfWeek.MONDAY || now.dayOfWeek == DayOfWeek.TUESDAY){
-                val i = Intent(this, UpdateActivityActivity::class.java)
-                startActivity(i)
-            }
+        Update.check(this, was_recently_seen)
+
+        //saveData(attemptsLeft, was_recently_seen)
+
 
         //ВЫБОР ЯЗЫКОВ
         val languages = resources.getStringArray(R.array.lang_array)
@@ -335,8 +337,9 @@ class MainActivity : AppCompatActivity() {
                                     msgList_FNL.add(nl_mask)
                                     //println(msgList_FNL)
                                     attemptsLeft -= 1
+
                                     attempts_text.text = "$attemptsLeft/5"
-                                    saveData(attemptsLeft)
+                                    saveData(attemptsLeft, was_recently_seen)
                                 }
                                 //КОНЕЦ UI ПОТОКА
                             }
@@ -588,24 +591,25 @@ class MainActivity : AppCompatActivity() {
                        // Called when the user can be rewarded.
                        attemptsLeft = 5
                        attempts_text.text = "$attemptsLeft/5"
-                       saveData(attemptsLeft)
+                       saveData(attemptsLeft, was_recently_seen)
                    }
                })
                show(this@MainActivity)
            }
 
     }
-    fun saveData(res: Int){
+    fun saveData(res: Int, bool: Boolean){
         val editor = pref?.edit()
         editor?.putInt("attempts", res)
+        editor?.putBoolean("wrs", bool)
         editor?.apply()
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
-        saveData(attemptsLeft)
-        println(saveData(attemptsLeft))
+        saveData(attemptsLeft, was_recently_seen)
+
     }
 //КОНЦ MAIN ACTIVITY==================================================================================
 fun resetAttempts() {
