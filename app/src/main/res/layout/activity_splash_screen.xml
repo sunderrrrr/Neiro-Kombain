@@ -29,21 +29,21 @@
 
             <TextView
                 android:id="@+id/textView"
-                android:layout_width="79dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="N"
-                android:textAlignment="center"
+                android:textAlignment="textEnd"
                 android:textColor="#7034FF"
                 android:textSize="60sp" />
 
             <TextView
                 android:id="@+id/textView2"
-                android:layout_width="69dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="K"
-                android:textAlignment="center"
+                android:textAlignment="viewStart"
                 android:textColor="#FFFFFF"
                 android:textSize="60sp" />
         </LinearLayout>
@@ -52,7 +52,7 @@
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Neiro/Kombain"
+                android:text="Neiro/Kombain"
             android:textAlignment="center"
             android:textColor="#FFFFFF"
             android:textSize="32sp" />

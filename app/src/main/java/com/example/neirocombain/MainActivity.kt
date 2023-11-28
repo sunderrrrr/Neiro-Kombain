@@ -3,6 +3,7 @@ package com.example.neirocombain
 
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -105,6 +106,13 @@ class MainActivity : AppCompatActivity() {
         val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL",)
         var isFirstGPT = true
         var isFirstDeepL = true
+
+        val now = LocalDate.now()
+            if(now.dayOfWeek == DayOfWeek.MONDAY || now.dayOfWeek == DayOfWeek.TUESDAY){
+                val i = Intent(this, UpdateActivityActivity::class.java)
+                startActivity(i)
+            }
+
         //ВЫБОР ЯЗЫКОВ
         val languages = resources.getStringArray(R.array.lang_array)
         val arrayAdapter = ArrayAdapter(/* context = */ this, /* resource = */ R.layout.dropdown_item, /* objects = */ languages)
