@@ -133,14 +133,14 @@ class MainActivity : AppCompatActivity() {
         MobileAds.initialize(this){
         MobileInstreamAds.setAdGroupPreloading(true)
         MobileAds.enableLogging(true)
-        banner.setAdUnitId("R-M-4088559-1")// BANER
+        banner.setAdUnitId("demo-banner-yandex")// BANER
         banner.setAdSize(BannerAdSize.fixedSize(this, 320, 70))
             val adRequest: AdRequest = Builder().build()
         println(adRequest)
         banner.run {
             println(adRequest)
             loadAd(adRequest) } }
-        banner.setOnClickListener { println("Я ТУТ") }
+        println("Баннер инициализирован")
         //КОНЕЦ БЛОКА РЕКЛАМЫ====================
 
         //КНОПКИ НАВИГАЦИИ================================
@@ -288,11 +288,12 @@ class MainActivity : AppCompatActivity() {
         //Блок отправки сообщений========================
         var isConnected = connectionChecker.checkConnection(this)
         etQuestion.setOnEditorActionListener(OnEditorActionListener{ textView, i, keyEvent ->
-            if (i==EditorInfo.IME_ACTION_SEND && !DEBUG_MODE && isConnected) {
+            if (i==EditorInfo.IME_ACTION_SEND && !DEBUG_MODE) {
+                isConnected = connectionChecker.checkConnection(this)
                 val final_send = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 val question = edittextval.replace(" ", "")
-                if (attemptsLeft > 0) {
+                if (attemptsLeft > 0 && isConnected) {
                     txtResponse.visibility = View.GONE
                     messageRV.visibility = View.VISIBLE
                     isConnected = connectionChecker.checkConnection(this)
@@ -311,7 +312,8 @@ class MainActivity : AppCompatActivity() {
                                 runOnUiThread {
                                     messageRV.visibility = View.VISIBLE
                                     messageList.removeLast()
-                                    val response_to_list = response.replace("\n", "")
+                                    var response_to_list = response.replace("\n", "")
+                                    response_to_list= response_to_list.replace("\"", "'")
                                     messageList.add(MessageRVModal(response, "bot"))
                                     messageRVAdapter.run { notifyDataSetChanged() }
                                     println("МАССИВ $messageList")
@@ -354,12 +356,14 @@ class MainActivity : AppCompatActivity() {
                         }
                     } else {
                         if (isSended) { Toast.makeText(applicationContext, "Вы уже отправили запрос! Дождитесь ответа", Toast.LENGTH_SHORT).show() }
-                        else { Toast.makeText(applicationContext,"Вы не ввели запрос или он слишком короткий!", Toast.LENGTH_SHORT).show() }
+                        //else { Toast.makeText(applicationContext,"Вы не ввели запрос или он слишком короткий!", Toast.LENGTH_SHORT).show() }
                     }
                 }
                 if (attemptsLeft == 0 && isConnected) {
                     Toast.makeText(applicationContext, "Количество запросов исчерпано. После воспроизведения рекламы они восстановятся", Toast.LENGTH_SHORT).show()
-                    showAd() } }
+                    showAd()
+                    println("Реклама показывается")
+                } }
             if (isConnected==false){
                 Toast.makeText(applicationContext, "Проверьте соединение с интернетом", Toast.LENGTH_SHORT).show()
             }
