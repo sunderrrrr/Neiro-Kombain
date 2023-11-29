@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         messageRV.layoutManager = layoutManager
         messageRVAdapter = MessageRVAdapter(messageList)
         messageRV.adapter = messageRVAdapter
-        val isConnected = connectionChecker.checkConnection(this)
+
         Update.check(this, was_recently_seen)
         //ВЫБОР ЯЗЫКОВ
 
@@ -286,6 +286,7 @@ class MainActivity : AppCompatActivity() {
         //КОНЕЦ КНОПОК НАВИГАЦИИ================================
 
         //Блок отправки сообщений========================
+        var isConnected = connectionChecker.checkConnection(this)
         etQuestion.setOnEditorActionListener(OnEditorActionListener{ textView, i, keyEvent ->
             if (i==EditorInfo.IME_ACTION_SEND && !DEBUG_MODE && isConnected) {
                 val final_send = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
@@ -294,7 +295,8 @@ class MainActivity : AppCompatActivity() {
                 if (attemptsLeft > 0) {
                     txtResponse.visibility = View.GONE
                     messageRV.visibility = View.VISIBLE
-                    if (question.isNotEmpty() && question.length >= 5 && isSended == false) {
+                    isConnected = connectionChecker.checkConnection(this)
+                    if (question.isNotEmpty() && question.length >= 5 && isSended == false && isConnected) {
                         if (mode == "ChatGPT") {
                             val user_mask = """{"role": "user", "content" :"$final_send"}"""
                             msgList_FNL.add(user_mask) //Сообщение для апи
@@ -358,6 +360,9 @@ class MainActivity : AppCompatActivity() {
                 if (attemptsLeft == 0 && isConnected) {
                     Toast.makeText(applicationContext, "Количество запросов исчерпано. После воспроизведения рекламы они восстановятся", Toast.LENGTH_SHORT).show()
                     showAd() } }
+            if (isConnected==false){
+                Toast.makeText(applicationContext, "Проверьте соединение с интернетом", Toast.LENGTH_SHORT).show()
+            }
             if (DEBUG_MODE){ Toast.makeText(applicationContext, "Эта версия предназначена для проверки дизайна и не имеет функционала", Toast.LENGTH_SHORT).show() }
         false
         })
