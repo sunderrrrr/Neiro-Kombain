@@ -2,8 +2,8 @@ package com.example.neirocombain
 
 
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -47,15 +47,9 @@ import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
-import java.time.DayOfWeek
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.Timer
-import java.util.TimerTask
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -78,7 +72,14 @@ class MainActivity : AppCompatActivity() {
     var pref: SharedPreferences? = null
     var attemptsLeft: Int = 0
     val Update = UpdateCheck()
+    val connectionChecker = InternetConnection()
     var was_recently_seen = false
+    val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL",)
+    var isSended = false
+    var isFirstGPT = true
+    var isFirstDeepL = true
+
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         //ИНИЦИАЛИЗАЦИЯ=========================================
         super.onCreate(savedInstanceState)
@@ -105,17 +106,10 @@ class MainActivity : AppCompatActivity() {
         messageRV.layoutManager = layoutManager
         messageRVAdapter = MessageRVAdapter(messageList)
         messageRV.adapter = messageRVAdapter
-        var isSended = false
-        val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL",)
-        var isFirstGPT = true
-        var isFirstDeepL = true
-        val now = LocalDate.now()
+        val isConnected = connectionChecker.checkConnection(this)
         Update.check(this, was_recently_seen)
-
-        //saveData(attemptsLeft, was_recently_seen)
-
-
         //ВЫБОР ЯЗЫКОВ
+
         val languages = resources.getStringArray(R.array.lang_array)
         val arrayAdapter = ArrayAdapter(/* context = */ this, /* resource = */ R.layout.dropdown_item, /* objects = */ languages)
         langTV.setAdapter(arrayAdapter)
@@ -124,7 +118,6 @@ class MainActivity : AppCompatActivity() {
         }
         dropMenu.visibility = View.GONE
         //КОНЕЦ ИНИЦИАЛИЗАЦИИ===================================================
-
         //БЛОК РЕКЛАМЫ===========================================================
         rewardedAdLoader = RewardedAdLoader(this).apply {
             setAdLoadListener(object : RewardedAdLoadListener {
@@ -132,10 +125,7 @@ class MainActivity : AppCompatActivity() {
                     this@MainActivity.rewardedAd = rewardedAd
                     // The ad was loaded successfully. Now you can show loaded ad.
                 }
-
                 override fun onAdFailedToLoad(adRequestError: AdRequestError) {
-                    // Ad failed to load with AdRequestError.
-                    // Attempting to load a new ad from the onAdFailedToLoad() method is strongly discouraged.
                 }
             })
         }
@@ -153,8 +143,6 @@ class MainActivity : AppCompatActivity() {
         banner.setOnClickListener { println("Я ТУТ") }
         //КОНЕЦ БЛОКА РЕКЛАМЫ====================
 
-
-
         //КНОПКИ НАВИГАЦИИ================================
         left_btn.setOnClickListener{
             if (selectedNl==2) {
@@ -171,12 +159,10 @@ class MainActivity : AppCompatActivity() {
                         dropMenu.visibility = View.GONE
                         messageRVAdapter = MessageRVAdapter(messageList)
                         messageRV.adapter = messageRVAdapter
-                        if(isFirstGPT==true){
-                        txtResponse.visibility = View.VISIBLE}
+                        if(isFirstGPT==true){txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
                         image.visibility=View.GONE
-                        txtResponse.text =
-                            "Что умеет ChatGPT: \n\n"+" 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
+                        txtResponse.text = "Что умеет ChatGPT: \n\n"+" 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
                         mainLO.animate().alpha(1f).setDuration(500)
                         model.animate().alpha(1f).setDuration(500)
                         attempts_text.animate().alpha(1f).setDuration(500)
@@ -194,8 +180,7 @@ class MainActivity : AppCompatActivity() {
                         model.text = nLinks[selectedNl]
                         messageRV.visibility = View.GONE
                         txtResponse.visibility = View.VISIBLE
-                        txtResponse.text =
-                            "Что умеет Dall-e 2:\n\n Может нарисовать картинку по вашему текстовому запросу в разрешении 512*512 пикселей. \n Фотореализм, аниме, краски итд. \n\nСценарии применения:\n Референсы для творческих работ, обложка альбома, обои и так далее"
+                        txtResponse.text = "Что умеет Dall-e 2:\n\n Может нарисовать картинку по вашему текстовому запросу в разрешении 512*512 пикселей. \n Фотореализм, аниме, краски итд. \n\nСценарии применения:\n Референсы для творческих работ, обложка альбома, обои и так далее"
                         dropMenu.visibility= View.GONE
                         image.visibility=View.VISIBLE
                         attempts_text.animate().alpha(1f).setDuration(500)
@@ -242,8 +227,7 @@ class MainActivity : AppCompatActivity() {
                         model.text = nLinks[selectedNl]
                         messageRV.visibility = View.GONE
                         txtResponse.visibility = View.VISIBLE
-                        txtResponse.text =
-                            "Что умеет Dall-e 2:\n\n Может нарисовать картинку по вашему текстовому запросу в разрешении 512*512 пикселей. \n Фотореализм, аниме, краски итд. \n\nСценарии применения:\n Референсы для творческих работ, обложка альбома, обои и так далее"
+                        txtResponse.text = "Что умеет Dall-e 2:\n\n Может нарисовать картинку по вашему текстовому запросу в разрешении 512*512 пикселей. \n Фотореализм, аниме, краски итд. \n\nСценарии применения:\n Референсы для творческих работ, обложка альбома, обои и так далее"
                         dropMenu.visibility= View.GONE
                         image.visibility=View.VISIBLE
                         attempts_text.animate().alpha(1f).setDuration(500)
@@ -262,8 +246,7 @@ class MainActivity : AppCompatActivity() {
                         attempts_text.alpha = 0f
                         model.text = nLinks[selectedNl]
                         dropMenu.visibility = View.VISIBLE
-                        if(isFirstDeepL==true){
-                            txtResponse.visibility = View.VISIBLE}
+                        if(isFirstDeepL){ txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
                         println("ВТОРИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА В ДИПЛ")
                         messageRVAdapter = MessageRVAdapter(DeepLList)
@@ -292,8 +275,7 @@ class MainActivity : AppCompatActivity() {
                         if(isFirstGPT==true){txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
                         image.visibility=View.GONE
-                        txtResponse.text =
-                                "Что умеет ChatGPT: \n\n" + " 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
+                        txtResponse.text = "Что умеет ChatGPT: \n\n" + " 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
                         mainLO.animate().setDuration(1000).alpha(1f)
                         model.animate().alpha(1f).setDuration(500)
                         attempts_text.animate().alpha(1f).setDuration(500)
@@ -305,9 +287,8 @@ class MainActivity : AppCompatActivity() {
 
         //Блок отправки сообщений========================
         etQuestion.setOnEditorActionListener(OnEditorActionListener{ textView, i, keyEvent ->
-            if (i==EditorInfo.IME_ACTION_SEND && DEBUG_MODE == false) {
-                val final_send =
-                    etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
+            if (i==EditorInfo.IME_ACTION_SEND && !DEBUG_MODE && isConnected) {
+                val final_send = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 val question = edittextval.replace(" ", "")
                 if (attemptsLeft > 0) {
@@ -332,12 +313,9 @@ class MainActivity : AppCompatActivity() {
                                     messageList.add(MessageRVModal(response, "bot"))
                                     messageRVAdapter.run { notifyDataSetChanged() }
                                     println("МАССИВ $messageList")
-                                    val nl_mask =
-                                        """{"role": "assistant", "content" :"$response_to_list"}"""
+                                    val nl_mask = """{"role": "assistant", "content" :"$response_to_list"}"""
                                     msgList_FNL.add(nl_mask)
-                                    //println(msgList_FNL)
                                     attemptsLeft -= 1
-
                                     attempts_text.text = "$attemptsLeft/5"
                                     saveData(attemptsLeft, was_recently_seen)
                                 }
@@ -347,9 +325,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (mode == "DALLE-E") {//DALL E
                             messageRV.visibility = View.GONE
-                            Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT)
-                                .show()
-                        }
+                            Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT).show() }
                         if (mode == "DeepL") {
                             txtResponse.visibility = View.GONE
                             isFirstDeepL = false
@@ -375,39 +351,14 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     } else {
-                        if (isSended == true) {
-                            Toast.makeText(
-                                applicationContext,
-                                "Вы уже отправили запрос! Дождитесь ответа",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        else {
-                            Toast.makeText(
-                                applicationContext,
-                                "Вы не ввели запрос или он слишком короткий!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
+                        if (isSended) { Toast.makeText(applicationContext, "Вы уже отправили запрос! Дождитесь ответа", Toast.LENGTH_SHORT).show() }
+                        else { Toast.makeText(applicationContext,"Вы не ввели запрос или он слишком короткий!", Toast.LENGTH_SHORT).show() }
                     }
                 }
-                if (attemptsLeft == 0) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Количество запросов исчерпано. После воспроизведения рекламы они восстановятся",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    showAd()
-                }
-            }
-            if (DEBUG_MODE){
-                Toast.makeText(
-                    applicationContext,
-                    "Эта версия предназначена для проверки дизайна и не имеет функционала",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+                if (attemptsLeft == 0 && isConnected) {
+                    Toast.makeText(applicationContext, "Количество запросов исчерпано. После воспроизведения рекламы они восстановятся", Toast.LENGTH_SHORT).show()
+                    showAd() } }
+            if (DEBUG_MODE){ Toast.makeText(applicationContext, "Эта версия предназначена для проверки дизайна и не имеет функционала", Toast.LENGTH_SHORT).show() }
         false
         })
         //КОНЕЦ ОТПРАВКИ ЗАПРОСА
@@ -438,7 +389,13 @@ class MainActivity : AppCompatActivity() {
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     println("API failed")
-                    callback("К сожалению произошла ошибка. Проверьте соединение с интернетом или попробуйте позже. Количество запросов не уменьшено")
+
+                    runOnUiThread { Toast.makeText(
+                        applicationContext,
+                        "К сожалению произошла ошибка. Проверьте соединение с интернетом или попробуйте позже. Количество запросов не уменьшено",
+                        Toast.LENGTH_SHORT
+                    ).show() }
+
                     attemptsLeft += 1
                 }
                 override fun onResponse(call: Call, response: Response) {
@@ -458,7 +415,12 @@ class MainActivity : AppCompatActivity() {
                     } catch (e: JSONException) {
                         println(body)
                         println("HEADER "+ response.headers?.toString())
-                        callback("К сожалению сервер сейчас недоступен. Количество запросов не уменьшено")
+                        runOnUiThread { Toast.makeText(
+                            applicationContext,
+                            "К сожалению сервер сейчас недоступен. Количество запросов не уменьшено",
+                            Toast.LENGTH_SHORT
+                        ).show() }
+
                         attemptsLeft += 1
                     }
                 }
@@ -482,7 +444,12 @@ class MainActivity : AppCompatActivity() {
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     println("API failed")
-                    callback("К сожалению произошла ошибка. Количество запросов не уменьшено")
+                    runOnUiThread { Toast.makeText(
+                        applicationContext,
+                        "К сожалению произошла ошибка. Количество запросов не уменьшено",
+                        Toast.LENGTH_SHORT
+                    ).show() }
+
                     attemptsLeft += 1
                 }
                 override fun onResponse(call: Call, response: Response) {
@@ -497,7 +464,12 @@ class MainActivity : AppCompatActivity() {
                     } catch (e: JSONException) {
                         println(body)
                         println("HEADER "+ response.headers?.toString())
-                        callback("К сожалению сервер сейчас недоступен. Проверьте соединение с интернетом или попробуйте позже")
+                        runOnUiThread { Toast.makeText(
+                            applicationContext,
+                            "К сожалению сервер сейчас недоступен. Проверьте соединение с интернетом или попробуйте позже",
+                            Toast.LENGTH_SHORT
+                        ).show() }
+
                         attemptsLeft += 1
                     }
                 }
@@ -523,7 +495,11 @@ class MainActivity : AppCompatActivity() {
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     println("API failed")
-                    callback("К сожалению произошла ошибка(. Количество запросов не уменьшено")
+                    runOnUiThread { Toast.makeText(
+                        applicationContext,
+                        "К сожалению произошла ошибка. Проверьте соединение с интернетом или попробуйте позже. Количество запросов не уменьшено",
+                        Toast.LENGTH_SHORT
+                    ).show() }
                     attemptsLeft += 1
                 }
 
@@ -545,7 +521,11 @@ class MainActivity : AppCompatActivity() {
                     } catch (e: JSONException) {
                         println(body)
                         println("HEADER "+ response.headers?.toString())
-                        callback("К сожалению сервер сейчас недоступен. Попробуйте позже")
+                        runOnUiThread { Toast.makeText(
+                            applicationContext,
+                            "К сожалению произошла ошибка. Проверьте соединение с интернетом или попробуйте позже. Количество запросов не уменьшено",
+                            Toast.LENGTH_SHORT
+                        ).show() }
                         attemptsLeft += 1
                     }
                 }
@@ -562,31 +542,28 @@ class MainActivity : AppCompatActivity() {
            rewardedAd?.apply {
                setAdEventListener(object : RewardedAdEventListener {
                    override fun onAdShown() {
-                       // Called when ad is shown.
                    }
 
                    override fun onAdFailedToShow(adError: AdError) {
-                       // Called when an RewardedAd failed to show
+                       runOnUiThread { Toast.makeText(
+                           applicationContext,
+                           "Ошибка показа рекламы",
+                           Toast.LENGTH_SHORT
+                       ).show() }
                    }
 
                    override fun onAdDismissed() {
-                       // Called when ad is dismissed.
-                       // Clean resources after Ad dismissed
+
                        rewardedAd?.setAdEventListener(null)
                        rewardedAd = null
-
-                       // Now you can preload the next rewarded ad.
                        loadRewardedAd()
                    }
-
                    override fun onAdClicked() {
-                       // Called when a click is recorded for an ad.
-                   }
 
+                   }
                    override fun onAdImpression(impressionData: ImpressionData?) {
-                       // Called when an impression is recorded for an ad.
-                   }
 
+                   }
                    override fun onRewarded(reward: Reward) {
                        // Called when the user can be rewarded.
                        attemptsLeft = 5
@@ -610,20 +587,10 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         saveData(attemptsLeft, was_recently_seen)
 
+
     }
 //КОНЦ MAIN ACTIVITY==================================================================================
-fun resetAttempts() {
-        val now = LocalDateTime.now()
-        val tomorrow = now.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
-        val duration = Duration.between(now, tomorrow)
-        val secondsUntilTomorrow = duration.seconds
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                var attemptsLeft = 15
-                println("Количество попыток восстановлено.")
-            }
-        }, secondsUntilTomorrow * 1000)
-    }}
+}
 
 
 

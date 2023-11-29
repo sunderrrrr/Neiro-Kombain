@@ -9,8 +9,8 @@
 
     <LinearLayout
         android:id="@+id/Logo_lay"
-        android:layout_width="387dp"
-        android:layout_height="254dp"
+        android:layout_width="388dp"
+        android:layout_height="287dp"
         android:layout_marginTop="282dp"
         android:layout_marginEnd="1dp"
         android:layout_marginBottom="390dp"
@@ -30,29 +30,31 @@
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:paddingStart="25sp"
                 android:text="N"
-                android:textAlignment="textEnd"
+                android:textAlignment="center"
                 android:textColor="#7034FF"
-                android:textSize="60sp" />
+                android:textSize="70sp" />
 
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:paddingEnd="18sp"
                 android:text="K"
-                android:textAlignment="viewStart"
+                android:textAlignment="center"
                 android:textColor="#FFFFFF"
-                android:textSize="60sp" />
+                android:textSize="70sp" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-                android:text="Neiro/Kombain"
+            android:text="Neiro/Kombain"
             android:textAlignment="center"
             android:textColor="#FFFFFF"
             android:textSize="32sp" />
@@ -81,12 +83,14 @@
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
-        android:text="BKMZ Software"
+        android:layout_marginTop="200dp"
+        android:layout_marginBottom="50dp"
+        android:text="BKMZ Dev"
         android:textColor="#FFFFFF"
         android:textSize="22sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Logo_lay"
         app:layout_constraintVertical_bias="0.0" />
