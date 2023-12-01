@@ -21,6 +21,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.annotation.GlideModule
+import com.bumptech.glide.module.AppGlideModule
 import com.google.android.material.textfield.TextInputLayout
 import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.banner.BannerAdView
@@ -39,9 +41,12 @@ import com.yandex.mobile.ads.rewarded.RewardedAdLoadListener
 import com.yandex.mobile.ads.rewarded.RewardedAdLoader
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONException
@@ -54,6 +59,7 @@ import kotlin.concurrent.schedule
 
 class MainActivity : AppCompatActivity() {
     var DEBUG_MODE = false//ВЫКЛ ВКЛ ДЕБАГ
+    val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
     lateinit var txtResponse: TextView
     private var rewardedAd: RewardedAd? = null
     private var rewardedAdLoader: RewardedAdLoader? = null
@@ -61,6 +67,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var attempts_text: TextView
     lateinit var edittextval: String
     lateinit var messageRV: RecyclerView
+    lateinit var image: ImageView
     lateinit var messageRVAdapter: MessageRVAdapter
     lateinit var messageList: ArrayList<MessageRVModal>
     lateinit var DeepLList: ArrayList<MessageRVModal>
@@ -74,12 +81,15 @@ class MainActivity : AppCompatActivity() {
     val Update = UpdateCheck()
     val connectionChecker = InternetConnection()
     var was_recently_seen = false
-    val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL",)
+    val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL")
     var isSended = false
     var isFirstGPT = true
     var isFirstDeepL = true
-
+    val JSON: MediaType = "application/json".toMediaType()
     @SuppressLint("SetTextI18n")
+    @GlideModule
+    class GlideApp : AppGlideModule()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         //ИНИЦИАЛИЗАЦИЯ=========================================
         super.onCreate(savedInstanceState)
@@ -91,16 +101,16 @@ class MainActivity : AppCompatActivity() {
         val banner = findViewById<BannerAdView>(R.id.banner)
         val layoutManager = LinearLayoutManager(applicationContext)
         val mainLO = findViewById<LinearLayout>(R.id.main)
-        val image = findViewById<ImageView>(R.id.image)
+        image = findViewById(R.id.image)
         val langTV = findViewById<AutoCompleteTextView>(R.id.lang)
         val dropMenu = findViewById<TextInputLayout>(R.id.dropMenu)
         txtResponse=findViewById(R.id.desc)
         attempts_text = findViewById(R.id.attemts)
         messageRV = findViewById(R.id.msgRV)
         pref = getSharedPreferences("shared", Context.MODE_PRIVATE)
-        attemptsLeft = pref?.getInt("attempts", 5)!!
+        attemptsLeft = pref?.getInt("attempts", 3)!!
         was_recently_seen = pref?.getBoolean("wrs", false)!!
-        attempts_text.text = attemptsLeft.toString() +"/5"
+        attempts_text.text = attemptsLeft.toString() +"/3"
         messageList = ArrayList()
         DeepLList = ArrayList()
         messageRV.layoutManager = layoutManager
@@ -133,8 +143,8 @@ class MainActivity : AppCompatActivity() {
         MobileAds.initialize(this){
         MobileInstreamAds.setAdGroupPreloading(true)
         MobileAds.enableLogging(true)
-        banner.setAdUnitId("demo-banner-yandex")// BANER
-        banner.setAdSize(BannerAdSize.fixedSize(this, 320, 70))
+        banner.setAdUnitId("R-M-4088559-1")// BANER
+        banner.setAdSize(BannerAdSize.fixedSize(this, 320, 80))
             val adRequest: AdRequest = Builder().build()
         println(adRequest)
         banner.run {
@@ -313,14 +323,15 @@ class MainActivity : AppCompatActivity() {
                                     messageRV.visibility = View.VISIBLE
                                     messageList.removeLast()
                                     var response_to_list = response.replace("\n", "")
-                                    response_to_list= response_to_list.replace("\"", "'")
+                                    response_to_list = response_to_list.replace("\"", "'")
                                     messageList.add(MessageRVModal(response, "bot"))
                                     messageRVAdapter.run { notifyDataSetChanged() }
+                                    messageRV.smoothScrollToPosition(messageRVAdapter.itemCount)
                                     println("МАССИВ $messageList")
                                     val nl_mask = """{"role": "assistant", "content" :"$response_to_list"}"""
                                     msgList_FNL.add(nl_mask)
                                     attemptsLeft -= 1
-                                    attempts_text.text = "$attemptsLeft/5"
+                                    attempts_text.text = "$attemptsLeft/3"
                                     saveData(attemptsLeft, was_recently_seen)
                                 }
                                 //КОНЕЦ UI ПОТОКА
@@ -329,7 +340,21 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (mode == "DALLE-E") {//DALL E
                             messageRV.visibility = View.GONE
-                            Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT).show() }
+                            val temp_url = "https://content.proxyapi.ru/oaidalleapiprodscus.blob.core.windows.net/private/org-06f179e75bfac08c9b75c7f847f84a6b/user-2e40ad879e955201df4dedbf8d479a12/img-jN4Sl1q2xTGfFsnLeSbw8fe1.png?st=2023-12-01T15%3A50%3A01Z&se=2023-12-01T17%3A50%3A01Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-11-30T23%3A19%3A40Z&ske=2023-12-01T23%3A19%3A40Z&sks=b&skv=2021-08-06&sig=J4kZ88Xk2rKgaQXRH8ijyhryIXGWL2dx0IQSvsJ%2B6hI%3D"
+                            Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT).show()
+                            image.visibility = View.VISIBLE
+                            var tmp_response = ""
+                            getResponse(final_send){response ->
+                            }
+
+
+                            attempts_text.text = "$attemptsLeft/3"
+
+
+
+
+
+                        }
                         if (mode == "DeepL") {
                             txtResponse.visibility = View.GONE
                             isFirstDeepL = false
@@ -349,7 +374,7 @@ class MainActivity : AppCompatActivity() {
                                     )
                                     println(DeepLList)
                                     attemptsLeft -= 1
-                                    attempts_text.text = "$attemptsLeft/5"
+                                    attempts_text.text = "$attemptsLeft/3"
                                     messageRVAdapter.notifyDataSetChanged()
                                 }
                             }
@@ -376,7 +401,7 @@ class MainActivity : AppCompatActivity() {
     //НАЧАЛО ОТПРАВКИ ЗАПРОСА К АПИ=================================================
     fun getResponse(question: String, callback: (String) -> Unit) { //Отправляем запрос
         if (mode == "ChatGPT") {
-            val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
+
             val url = "https://api.proxyapi.ru/openai/v1/chat/completions"
             val last_symb = msgList_FNL.toString().length
             val msg_req = msgList_FNL.toString().substring(1..last_symb - 2)
@@ -437,52 +462,49 @@ class MainActivity : AppCompatActivity() {
         }
         //Конец ChatGPT=======================================================================
         if (mode == "DALLE-E") {
-            println("Отправляю запрос")
-            val body = """
-            {
-            "model": "dall-e-3",
-            "prompt": "$question",
-            "n": 1,
-            "size": "256x256"
-          }
-            """.trimIndent()
-          println(body)
-            val request = Request.Builder().url("https://api.proxyapi.ru/openai/v1/images/generations").header("Content-Type", "application/json").addHeader("Authorization", "Bearer sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9").post(body.toRequestBody()).build()
-            println(request.toString())
-            //val executor = Executors.newSingleThreadExecutor()
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    println("API failed")
-                    runOnUiThread { Toast.makeText(
-                        applicationContext,
-                        "К сожалению произошла ошибка. Количество запросов не уменьшено",
-                        Toast.LENGTH_SHORT
-                    ).show() }
-
-                    attemptsLeft += 1
+            val JSONbody = JSONObject()
+                try{
+                    JSONbody.put("prompt", question)
+                    JSONbody.put("size", "256x256")
+                }catch(e:Exception) {
+                    e.printStackTrace()
                 }
-                override fun onResponse(call: Call, response: Response) {
-                    val body = response.toString()
-                    println("D3 $body")
-                    if (body != null) {
-                        Log.v("data", body)
-                    } else {
-                        Log.v("data", "empty")
+            val requestBody: RequestBody = RequestBody.create(JSON, JSONbody.toString())
+            val request: Request = Request.Builder().url("https://api.proxyapi.ru/openai/v1/images/generations").header("Authorization", "Bearer $apiKey").post(requestBody).build()
+            client.newCall(request).enqueue(object :Callback{
+                override fun onFailure(call: Call, e: IOException) {
+                    runOnUiThread {
+                        Toast.makeText(
+                            applicationContext,
+                            "Ошибка в генерации изображения",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
+                }
+
+                override fun onResponse(call: Call, response: Response) {
                     try {
-                    } catch (e: JSONException) {
-                        println(body)
-                        println("HEADER "+ response.headers?.toString())
+                        val jsonObject= JSONObject(response.body!!.string())
+                        println(jsonObject)
+                        val imgUrl = jsonObject.getJSONArray("data").getJSONObject(0).getString("url")
+                        println(imgUrl)
+                       // Glide.with(this@MainActivity).load(imgUrl).into(image)
+                        callback(imgUrl)
+                        attemptsLeft = 0
+
+                    }catch (e:Exception){
+                        e.printStackTrace()
                         runOnUiThread { Toast.makeText(
                             applicationContext,
-                            "К сожалению сервер сейчас недоступен. Проверьте соединение с интернетом или попробуйте позже",
+                            "Произошла ошибка! Повторите позже",
                             Toast.LENGTH_SHORT
                         ).show() }
-
-                        attemptsLeft += 1
                     }
                 }
+
             })
+
+
             }
         //Конец DALLE-E============================================================================
         if (mode=="DeepL"){
@@ -490,7 +512,7 @@ class MainActivity : AppCompatActivity() {
             val url = "https://api.proxyapi.ru/openai/v1/chat/completions"
             val requestBody = """
             {
-                "model": "gpt-3.5-turbo",
+                "model": "gpt-3.5-turbo-1106",
                 "messages": [{"role": "user", "content": "Переведи этот текст на $selectedLang: $question"}]
             }
             """.trimIndent()
@@ -575,8 +597,8 @@ class MainActivity : AppCompatActivity() {
                    }
                    override fun onRewarded(reward: Reward) {
                        // Called when the user can be rewarded.
-                       attemptsLeft = 5
-                       attempts_text.text = "$attemptsLeft/5"
+                       attemptsLeft = 3
+                       attempts_text.text = "$attemptsLeft/3"
                        saveData(attemptsLeft, was_recently_seen)
                    }
                })
@@ -595,8 +617,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         saveData(attemptsLeft, was_recently_seen)
-
-
     }
 //КОНЦ MAIN ACTIVITY==================================================================================
 }
