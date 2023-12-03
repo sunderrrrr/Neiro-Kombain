@@ -5,6 +5,9 @@ package com.example.neirocombain
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -21,8 +24,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.annotation.GlideModule
-import com.bumptech.glide.module.AppGlideModule
 import com.google.android.material.textfield.TextInputLayout
 import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.banner.BannerAdView
@@ -52,6 +53,8 @@ import okhttp3.Response
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.Timer
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
@@ -87,8 +90,7 @@ class MainActivity : AppCompatActivity() {
     var isFirstDeepL = true
     val JSON: MediaType = "application/json".toMediaType()
     @SuppressLint("SetTextI18n")
-    @GlideModule
-    class GlideApp : AppGlideModule()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         //ИНИЦИАЛИЗАЦИЯ=========================================
@@ -343,12 +345,13 @@ class MainActivity : AppCompatActivity() {
                             val temp_url = "https://content.proxyapi.ru/oaidalleapiprodscus.blob.core.windows.net/private/org-06f179e75bfac08c9b75c7f847f84a6b/user-2e40ad879e955201df4dedbf8d479a12/img-jN4Sl1q2xTGfFsnLeSbw8fe1.png?st=2023-12-01T15%3A50%3A01Z&se=2023-12-01T17%3A50%3A01Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-11-30T23%3A19%3A40Z&ske=2023-12-01T23%3A19%3A40Z&sks=b&skv=2021-08-06&sig=J4kZ88Xk2rKgaQXRH8ijyhryIXGWL2dx0IQSvsJ%2B6hI%3D"
                             Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT).show()
                             image.visibility = View.VISIBLE
-                            var tmp_response = ""
                             getResponse(final_send){response ->
+                                DownloadImageTask(image).execute(response)
+                                attemptsLeft = 0
+                                attempts_text.text = "$attemptsLeft/3"
+                                showAd()
                             }
 
-
-                            attempts_text.text = "$attemptsLeft/3"
 
 
 
@@ -408,7 +411,7 @@ class MainActivity : AppCompatActivity() {
 
             val requestBody = """
             {
-                "model": "gpt-3.5-turbo",
+                "model": "gpt-3.5-turbo-1106",
                 "messages": [$msg_req]     
             }
             """.trimIndent()
@@ -464,6 +467,7 @@ class MainActivity : AppCompatActivity() {
         if (mode == "DALLE-E") {
             val JSONbody = JSONObject()
                 try{
+                    JSONbody.put("model", "dall-e-2")
                     JSONbody.put("prompt", question)
                     JSONbody.put("size", "256x256")
                 }catch(e:Exception) {
@@ -489,6 +493,8 @@ class MainActivity : AppCompatActivity() {
                         val imgUrl = jsonObject.getJSONArray("data").getJSONObject(0).getString("url")
                         println(imgUrl)
                        // Glide.with(this@MainActivity).load(imgUrl).into(image)
+                        image.visibility = View.VISIBLE
+
                         callback(imgUrl)
                         attemptsLeft = 0
 
@@ -617,6 +623,30 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         saveData(attemptsLeft, was_recently_seen)
+    }
+
+    private class DownloadImageTask(internal var imageView: ImageView) : AsyncTask<String, Void, Bitmap?>() {
+        override fun doInBackground(vararg params: String): Bitmap? {
+            val imageUrl = params[0]
+            var bitmap: Bitmap? = null
+            try {
+                println("Скачивание началось")
+                val url = URL(imageUrl)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.doInput = true
+                connection.connect()
+                val input = connection.inputStream
+                bitmap = BitmapFactory.decodeStream(input)
+                println("Заливаем картинку")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            return bitmap
+        }
+
+        override fun onPostExecute(result: Bitmap?) {
+            imageView.setImageBitmap(result)
+        }
     }
 //КОНЦ MAIN ACTIVITY==================================================================================
 }

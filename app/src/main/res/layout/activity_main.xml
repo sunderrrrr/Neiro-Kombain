@@ -101,10 +101,10 @@
 
     <com.yandex.mobile.ads.banner.BannerAdView
         android:id="@+id/banner"
-        android:layout_width="380dp"
-        android:layout_height="70dp"
+        android:layout_width="359dp"
+        android:layout_height="81dp"
         android:layout_marginBottom="10dp"
-        android:background="#FFFFFF"
+        android:background="#00FFFFFF"
         android:gravity="center_horizontal"
         app:layout_constraintBottom_toTopOf="@+id/request"
         app:layout_constraintEnd_toEndOf="parent"
@@ -148,7 +148,7 @@
         <ImageView
             android:id="@+id/rightarr"
             android:layout_width="134dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10sp"
             android:layout_marginBottom="10sp"
             android:layout_weight="1"
