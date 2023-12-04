@@ -2,7 +2,6 @@ package com.example.neirocombain
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -15,6 +14,7 @@ class UpdateActivityActivity : AppCompatActivity() {
         back_btn.setOnClickListener{
             val intent1 = Intent(this, MainActivity::class.java)
             ContextCompat.startActivity(this, intent1, null)
+
         }
     }
 }
