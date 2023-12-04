@@ -1,3 +1,5 @@
+@file:Suppress("SpellCheckingInspection")
+
 package com.example.neirocombain
 
 
@@ -56,7 +58,7 @@ import kotlin.concurrent.schedule
 
 
 class MainActivity : AppCompatActivity() {
-    var DEBUG_MODE = false//ВЫКЛ ВКЛ ДЕБАГ
+    private var DEBUG_MODE = false//ВЫКЛ ВКЛ ДЕБАГ
     val url_api = "https://api.proxyapi.ru/openai/" // v1/chat/completions
     val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
     val reward_ad_id = "R-M-4088559-2"
@@ -73,21 +75,22 @@ class MainActivity : AppCompatActivity() {
     lateinit var messageList: ArrayList<MessageRVModal>
     lateinit var DeepLList: ArrayList<MessageRVModal>
     private val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build()
-    public var mode = "ChatGPT"
+    var mode = "ChatGPT"
     var selectedNl = 1
     var msgList_FNL = mutableListOf<String>()
     var selectedLang = ""
     var attemptsLeft: Int = 0
     val connectionChecker = InternetConnection()
-    public var was_recently_seen = false
+    var was_recently_seen = false
     val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL")
     var isSended = false
     var isFirstGPT = true
     var isFirstDeepL = true
+    var isFirstDalle = true
     val JSON: MediaType = "application/json".toMediaType()
     var pref: SharedPreferences? = getSharedPreferences("shared", Context.MODE_PRIVATE)
     val Saver = SaveData()
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -131,7 +134,6 @@ class MainActivity : AppCompatActivity() {
             setAdLoadListener(object : RewardedAdLoadListener {
                 override fun onAdLoaded(rewardedAd: RewardedAd) {
                     this@MainActivity.rewardedAd = rewardedAd
-                    // The ad was loaded successfully. Now you can show loaded ad.
                 }
                 override fun onAdFailedToLoad(adRequestError: AdRequestError) {
                 }
@@ -167,13 +169,13 @@ class MainActivity : AppCompatActivity() {
                         dropMenu.visibility = View.GONE
                         messageRVAdapter = MessageRVAdapter(messageList)
                         messageRV.adapter = messageRVAdapter
-                        if(isFirstGPT==true){txtResponse.visibility = View.VISIBLE}
+                        if(isFirstGPT){txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
                         image.visibility=View.GONE
                         txtResponse.text = "Что умеет ChatGPT: \n\n"+" 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
-                        mainLO.animate().alpha(1f).setDuration(500)
-                        model.animate().alpha(1f).setDuration(500)
-                        attempts_text.animate().alpha(1f).setDuration(500)
+                        mainLO.animate().alpha(1f).duration = 500
+                        model.animate().alpha(1f).duration = 500
+                        attempts_text.animate().alpha(1f).duration = 500
                     }
                 }
             }
@@ -187,13 +189,19 @@ class MainActivity : AppCompatActivity() {
                         attempts_text.alpha = 0f
                         model.text = nLinks[selectedNl]
                         messageRV.visibility = View.GONE
-                        txtResponse.visibility = View.VISIBLE
-                        txtResponse.text = "Что умеет Dall-e 2:\n\n Может нарисовать картинку по вашему текстовому запросу в разрешении 512*512 пикселей. \n Фотореализм, аниме, краски итд. \n\nСценарии применения:\n Референсы для творческих работ, обложка альбома, обои и так далее"
+                        if(isFirstDalle) {
+                            txtResponse.visibility = View.VISIBLE
+                            txtResponse.text =
+                                "Что умеет Dall-e 2:\n\n Может нарисовать картинку по вашему текстовому запросу в разрешении 512*512 пикселей. \n Фотореализм, аниме, краски итд. \n\nСценарии применения:\n Референсы для творческих работ, обложка альбома, обои и так далее"
+                        }else{
+                            image.visibility = View.VISIBLE
+                            txtResponse.visibility = View.GONE
+                        }
                         dropMenu.visibility= View.GONE
                         image.visibility=View.VISIBLE
-                        attempts_text.animate().alpha(1f).setDuration(500)
-                        mainLO.animate().alpha(1f).setDuration(500)
-                        model.animate().alpha(1f).setDuration(500)
+                        attempts_text.animate().alpha(1f).duration = 500
+                        mainLO.animate().alpha(1f).duration = 500
+                        model.animate().alpha(1f).duration = 500
                     }
                 }
             }
@@ -207,7 +215,7 @@ class MainActivity : AppCompatActivity() {
                         attempts_text.alpha = 0f
                         model.text = nLinks[selectedNl]
                         dropMenu.visibility = View.VISIBLE
-                        if(isFirstDeepL==true){
+                        if(isFirstDeepL){
                             txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
                         println("ВТОРИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА В ДИПЛ")
@@ -215,9 +223,9 @@ class MainActivity : AppCompatActivity() {
                         messageRV.adapter = messageRVAdapter
                         image.visibility=View.GONE
                         txtResponse.text = "Что умеет DeepL: \n\n1.Автоматически обнажуривать язык источника\n\n 2.Понимает сленг и идиомы\n\n 3.Имеет при себе большую языковую базу \n\n 4.Более точный перевод с помощью нейросетей"
-                        mainLO.animate().alpha(1f).setDuration(500)
-                        model.animate().alpha(1f).setDuration(500)
-                        attempts_text.animate().alpha(1f).setDuration(500)
+                        mainLO.animate().alpha(1f).duration = 500
+                        model.animate().alpha(1f).duration = 500
+                        attempts_text.animate().alpha(1f).duration = 500
                     }
                 }
             }
@@ -234,13 +242,19 @@ class MainActivity : AppCompatActivity() {
                         attempts_text.alpha = 0f
                         model.text = nLinks[selectedNl]
                         messageRV.visibility = View.GONE
-                        txtResponse.visibility = View.VISIBLE
-                        txtResponse.text = "Что умеет Dall-e 2:\n\n Может нарисовать картинку по вашему текстовому запросу в разрешении 512*512 пикселей. \n Фотореализм, аниме, краски итд. \n\nСценарии применения:\n Референсы для творческих работ, обложка альбома, обои и так далее"
+                        if(isFirstDalle) {
+                            txtResponse.visibility = View.VISIBLE
+                            txtResponse.text =
+                                "Что умеет Dall-e 2:\n\n Может нарисовать картинку по вашему текстовому запросу в разрешении 512*512 пикселей. \n Фотореализм, аниме, краски итд. \n\nСценарии применения:\n Референсы для творческих работ, обложка альбома, обои и так далее"
+                        }else{
+                            image.visibility = View.VISIBLE
+                            txtResponse.visibility = View.GONE
+                        }
                         dropMenu.visibility= View.GONE
                         image.visibility=View.VISIBLE
-                        attempts_text.animate().alpha(1f).setDuration(500)
-                        mainLO.animate().alpha(1f).setDuration(500)
-                        model.animate().alpha(1f).setDuration(500)
+                        attempts_text.animate().alpha(1f).duration = 500
+                        mainLO.animate().alpha(1f).duration = 500
+                        model.animate().alpha(1f).duration = 500
                     }
                 }
             }
@@ -261,9 +275,9 @@ class MainActivity : AppCompatActivity() {
                         messageRV.adapter = messageRVAdapter
                         image.visibility=View.GONE
                         txtResponse.text = "Что умеет DeepL: \n\n1.Автоматически обнажуривать язык источника\n\n 2.Понимает сленг и идиомы\n\n 3.Имеет при себе большую языковую базу \n\n 4.Более точный перевод с помощью нейросетей"
-                        mainLO.animate().alpha(1f).setDuration(500)
-                        model.animate().alpha(1f).setDuration(500)
-                        attempts_text.animate().alpha(1f).setDuration(500)
+                        mainLO.animate().alpha(1f).duration = 500
+                        model.animate().alpha(1f).duration = 500
+                        attempts_text.animate().alpha(1f).duration = 500
                     }
                 }
             }
@@ -280,13 +294,13 @@ class MainActivity : AppCompatActivity() {
                         txtResponse.visibility = View.GONE
                         messageRVAdapter=MessageRVAdapter(messageList)
                         messageRV.adapter=messageRVAdapter
-                        if(isFirstGPT==true){txtResponse.visibility = View.VISIBLE}
+                        if(isFirstGPT){txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
                         image.visibility=View.GONE
                         txtResponse.text = "Что умеет ChatGPT: \n\n" + " 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
                         mainLO.animate().setDuration(1000).alpha(1f)
-                        model.animate().alpha(1f).setDuration(500)
-                        attempts_text.animate().alpha(1f).setDuration(500)
+                        model.animate().alpha(1f).duration = 500
+                        attempts_text.animate().alpha(1f).duration = 500
                     }
                 }
             }
@@ -305,7 +319,7 @@ class MainActivity : AppCompatActivity() {
                     txtResponse.visibility = View.GONE
                     messageRV.visibility = View.VISIBLE
                     isConnected = connectionChecker.checkConnection(this)
-                    if (question.isNotEmpty() && question.length >= 5 && isSended == false && isConnected) {
+                    if (question.isNotEmpty() && question.length >= 5 && !isSended && isConnected) {
                         if (mode == "ChatGPT") {
                             val user_mask = """{"role": "user", "content" :"$final_send"}"""
                             msgList_FNL.add(user_mask) //Сообщение для апи
@@ -337,22 +351,16 @@ class MainActivity : AppCompatActivity() {
                             isSended = false
                         }
                         if (mode == "DALLE-E") {//DALL E
+                            isFirstDalle = false
                             messageRV.visibility = View.GONE
-                            val temp_url = "https://content.proxyapi.ru/oaidalleapiprodscus.blob.core.windows.net/private/org-06f179e75bfac08c9b75c7f847f84a6b/user-2e40ad879e955201df4dedbf8d479a12/img-jN4Sl1q2xTGfFsnLeSbw8fe1.png?st=2023-12-01T15%3A50%3A01Z&se=2023-12-01T17%3A50%3A01Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-11-30T23%3A19%3A40Z&ske=2023-12-01T23%3A19%3A40Z&sks=b&skv=2021-08-06&sig=J4kZ88Xk2rKgaQXRH8ijyhryIXGWL2dx0IQSvsJ%2B6hI%3D"
                             Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT).show()
                             image.visibility = View.VISIBLE
-                            getResponse(final_send){response ->
+                            getResponse(final_send) { response ->
                                 DownloadImageTask123(image).execute(response)
                                 attemptsLeft = 0
                                 attempts_text.text = "$attemptsLeft/3"
                                 showAd()
                             }
-
-
-
-
-
-
                         }
                         if (mode == "DeepL") {
                             txtResponse.visibility = View.GONE
@@ -383,7 +391,7 @@ class MainActivity : AppCompatActivity() {
                     showAd()
                     println("Реклама показывается")
                 } }
-            if (isConnected==false){
+            if (!isConnected){
                 Toast.makeText(applicationContext, "Проверьте соединение с интернетом", Toast.LENGTH_SHORT).show()
             }
             if (DEBUG_MODE){ Toast.makeText(applicationContext, "Эта версия предназначена для проверки дизайна и не имеет функционала", Toast.LENGTH_SHORT).show() }
@@ -404,7 +412,7 @@ class MainActivity : AppCompatActivity() {
                 "messages": [$msg_req]     
             }
             """.trimIndent()
-            println("REQUESRT BODY"+requestBody)
+            println("REQUESRT BODY$requestBody")
             val request = Request.Builder()
                 .url(url_api +"v1/chat/completions")
                 .addHeader("Content-Type", "application/json")
@@ -425,15 +433,14 @@ class MainActivity : AppCompatActivity() {
                         Log.v("data", "empty")
                     }
                     try {
-                        val jsonObject = JSONObject(body)
+                        val jsonObject = JSONObject(body!!)
                         val jsonArray = jsonObject.getJSONArray("choices")
-                        var test = jsonArray.getJSONObject(0)
+                        val test = jsonArray.getJSONObject(0)
                         val message = test.getJSONObject("message")
                         val final_res = message.getString("content")
                         callback(final_res)
                     } catch (e: JSONException) {
                         println(body)
-                        println("HEADER "+ response.headers?.toString())
                         runOnUiThread { Toast.makeText(applicationContext, "К сожалению сервер сейчас недоступен. Количество запросов не уменьшено", Toast.LENGTH_SHORT).show() }
                         attemptsLeft += 1
                     }
@@ -450,7 +457,7 @@ class MainActivity : AppCompatActivity() {
                 }catch(e:Exception) {
                     e.printStackTrace()
                 }
-            val requestBody: RequestBody = RequestBody.create(JSON, JSONbody.toString())
+            val requestBody: RequestBody = JSONbody.toString().toRequestBody(JSON)
             val request: Request = Request.Builder().url(url_api+"v1/images/generations").header("Authorization", "Bearer $apiKey").post(requestBody).build()
             client.newCall(request).enqueue(object :Callback{
                 override fun onFailure(call: Call, e: IOException) {
@@ -511,15 +518,15 @@ class MainActivity : AppCompatActivity() {
                         Log.v("data", "empty")
                     }
                     try {
-                        val jsonObject = JSONObject(body)
+                        val jsonObject = JSONObject(body!!)
                         val jsonArray = jsonObject.getJSONArray("choices")
-                        var test = jsonArray.getJSONObject(0)
+                        val test = jsonArray.getJSONObject(0)
                         val message = test.getJSONObject("message")
                         val final_res = message.getString("content")
                         callback(final_res)
                     } catch (e: JSONException) {
                         println(body)
-                        println("HEADER "+ response.headers?.toString())
+                        println("HEADER "+ response.headers.toString())
                         runOnUiThread { Toast.makeText(
                             applicationContext,
                             "К сожалению произошла ошибка. Проверьте соединение с интернетом или попробуйте позже. Количество запросов не уменьшено",
@@ -555,6 +562,7 @@ class MainActivity : AppCompatActivity() {
                        loadRewardedAd() }
                    override fun onAdClicked() {}
                    override fun onAdImpression(impressionData: ImpressionData?) {}
+                   @SuppressLint("SetTextI18n")
                    override fun onRewarded(reward: Reward) {
                        // Called when the user can be rewarded.
                        attemptsLeft = 3
