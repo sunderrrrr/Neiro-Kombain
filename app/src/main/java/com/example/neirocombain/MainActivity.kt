@@ -88,7 +88,8 @@ class MainActivity : AppCompatActivity() {
     var isFirstDeepL = true
     var isFirstDalle = true
     val JSON: MediaType = "application/json".toMediaType()
-    var pref: SharedPreferences? = getSharedPreferences("shared", Context.MODE_PRIVATE)
+    var pref: SharedPreferences? = null
+
     val Saver = SaveData()
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
 
@@ -97,6 +98,9 @@ class MainActivity : AppCompatActivity() {
         //ИНИЦИАЛИЗАЦИЯ=========================================
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        println("после pref")
+        pref = this.getSharedPreferences("shared", Context.MODE_PRIVATE)!!
+        println("ДО pref")
         etQuestion=findViewById(R.id.request)
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
