@@ -8,7 +8,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
@@ -39,19 +38,7 @@ import com.yandex.mobile.ads.rewarded.RewardedAd
 import com.yandex.mobile.ads.rewarded.RewardedAdEventListener
 import com.yandex.mobile.ads.rewarded.RewardedAdLoadListener
 import com.yandex.mobile.ads.rewarded.RewardedAdLoader
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MediaType
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import org.json.JSONException
-import org.json.JSONObject
-import java.io.IOException
 import java.util.Timer
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
@@ -85,11 +72,10 @@ class MainActivity : AppCompatActivity() {
     val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL")
     var isSended = false
     var isFirstGPT = true
+    var isLangSelected = false
     var isFirstDeepL = true
     var isFirstDalle = true
-    val JSON: MediaType = "application/json".toMediaType()
     var pref: SharedPreferences? = null
-
     val Saver = SaveData()
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
 
@@ -98,9 +84,7 @@ class MainActivity : AppCompatActivity() {
         //ИНИЦИАЛИЗАЦИЯ=========================================
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        println("после pref")
         pref = this.getSharedPreferences("shared", Context.MODE_PRIVATE)!!
-        println("ДО pref")
         etQuestion=findViewById(R.id.request)
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
@@ -130,6 +114,7 @@ class MainActivity : AppCompatActivity() {
         langTV.setAdapter(arrayAdapter)
         langTV.onItemClickListener= AdapterView.OnItemClickListener { adapterView, view, i, l ->
             selectedLang = adapterView.getItemAtPosition(i).toString()
+            isLangSelected = true
         }
         dropMenu.visibility = View.GONE
         //КОНЕЦ ИНИЦИАЛИЗАЦИИ===================================================
@@ -150,7 +135,6 @@ class MainActivity : AppCompatActivity() {
         banner.setAdUnitId(banner_ad_id)// BANER
         banner.setAdSize(BannerAdSize.fixedSize(this, 320, 80))
             val adRequest: AdRequest = Builder().build()
-
         banner.run {
             println(adRequest)
             loadAd(adRequest) } }
@@ -334,7 +318,7 @@ class MainActivity : AppCompatActivity() {
                             etQuestion.setText("")
                             messageList.add(MessageRVModal("Печатает...", "bot"))
                             //Отправляем строку в функцию
-                            getResponse(question) { response ->
+                            NeiroApi(attemptsLeft).getResponse(question, client, msgList_FNL, mode, url_api, apiKey,selectedLang) { response ->
                                 runOnUiThread {
                                     messageRV.visibility = View.VISIBLE
                                     messageList.removeLast()
@@ -358,22 +342,22 @@ class MainActivity : AppCompatActivity() {
                             isFirstDalle = false
                             messageRV.visibility = View.GONE
                             Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT).show()
-                            image.visibility = View.VISIBLE
+                            /*image.visibility = View.VISIBLE
                             getResponse(final_send) { response ->
                                 DownloadImageTask123(image).execute(response)
                                 attemptsLeft = 0
                                 attempts_text.text = "$attemptsLeft/3"
                                 showAd()
-                            }
+                            }*/
                         }
-                        if (mode == "DeepL") {
+                        if (mode == "DeepL" && isLangSelected) {
                             txtResponse.visibility = View.GONE
                             isFirstDeepL = false
                             messageRV.visibility = View.VISIBLE
                             DeepLList.add(MessageRVModal(final_send, "user"))
                             messageRVAdapter.run { notifyDataSetChanged() }
                             DeepLList.add(MessageRVModal("Печатает...", "bot"))
-                            getResponse(final_send) { response ->
+                            NeiroApi(attemptsLeft).getResponse(question, client, msgList_FNL, mode, url_api, apiKey,selectedLang) { response ->
                                 runOnUiThread {
                                     println(response)
                                     println("ОТВЕТ ПОЛУЧЕН")
@@ -386,6 +370,10 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         }
+                        if(!isLangSelected && mode=="DeepL"){
+                            Toast.makeText(applicationContext, "Вы не выбрали язык", Toast.LENGTH_SHORT).show()
+                        }
+
                     } else {
                         if (isSended) { Toast.makeText(applicationContext, "Вы уже отправили запрос! Дождитесь ответа", Toast.LENGTH_SHORT).show() }
                     }
@@ -404,145 +392,6 @@ class MainActivity : AppCompatActivity() {
         //КОНЕЦ ОТПРАВКИ ЗАПРОСА
         //КОНЕЦ КЛАССА OnCreate и UI потока
     }
-    //НАЧАЛО ОТПРАВКИ ЗАПРОСА К АПИ=================================================
-    fun getResponse(question: String, callback: (String) -> Unit) { //Отправляем запрос
-        if (mode == "ChatGPT") {
-
-            val last_symb = msgList_FNL.toString().length
-            val msg_req = msgList_FNL.toString().substring(1..last_symb - 2)
-            val requestBody = """
-            {
-                "model": "gpt-3.5-turbo-1106",
-                "messages": [$msg_req]     
-            }
-            """.trimIndent()
-            println("REQUESRT BODY$requestBody")
-            val request = Request.Builder()
-                .url(url_api +"v1/chat/completions")
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "Bearer $apiKey")
-                .post(requestBody.trimIndent().toRequestBody("application/json".toMediaTypeOrNull())).build()
-            println(request.toString())
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    println("API failed")
-                    runOnUiThread { Toast.makeText(applicationContext, "К сожалению произошла ошибка. Проверьте соединение с интернетом или попробуйте позже. Количество запросов не уменьшено", Toast.LENGTH_SHORT).show() }
-                    attemptsLeft += 1
-                }
-                override fun onResponse(call: Call, response: Response) {
-                    val body = response.body?.string()
-                    if (body != null) {
-                        Log.v("data", body)
-                    } else {
-                        Log.v("data", "empty")
-                    }
-                    try {
-                        val jsonObject = JSONObject(body!!)
-                        val jsonArray = jsonObject.getJSONArray("choices")
-                        val test = jsonArray.getJSONObject(0)
-                        val message = test.getJSONObject("message")
-                        val final_res = message.getString("content")
-                        callback(final_res)
-                    } catch (e: JSONException) {
-                        println(body)
-                        runOnUiThread { Toast.makeText(applicationContext, "К сожалению сервер сейчас недоступен. Количество запросов не уменьшено", Toast.LENGTH_SHORT).show() }
-                        attemptsLeft += 1
-                    }
-                }
-            })
-        }
-        //Конец ChatGPT=======================================================================
-        if (mode == "DALLE-E") {
-            val JSONbody = JSONObject()
-                try{
-                    JSONbody.put("model", "dall-e-2")
-                    JSONbody.put("prompt", question)
-                    JSONbody.put("size", "256x256")
-                }catch(e:Exception) {
-                    e.printStackTrace()
-                }
-            val requestBody: RequestBody = JSONbody.toString().toRequestBody(JSON)
-            val request: Request = Request.Builder().url(url_api+"v1/images/generations").header("Authorization", "Bearer $apiKey").post(requestBody).build()
-            client.newCall(request).enqueue(object :Callback{
-                override fun onFailure(call: Call, e: IOException) {
-                    runOnUiThread {
-                        Toast.makeText(
-                            applicationContext,
-                            "Ошибка в генерации изображения",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-                override fun onResponse(call: Call, response: Response) {
-                    try {
-                        val jsonObject= JSONObject(response.body!!.string())
-                        val imgUrl = jsonObject.getJSONArray("data").getJSONObject(0).getString("url")
-                        println(imgUrl)
-                        callback(imgUrl)
-                        attemptsLeft = 0
-                    }catch (e:Exception){
-                        e.printStackTrace()
-                        runOnUiThread { Toast.makeText(applicationContext, "Произошла ошибка! Повторите позже", Toast.LENGTH_SHORT).show() }
-                    }
-                }
-            })
-            }
-        //Конец DALLE-E============================================================================
-        if (mode=="DeepL"){
-
-            val requestBody = """
-            {
-                "model": "gpt-3.5-turbo-1106",
-                "messages": [{"role": "user", "content": "Переведи этот текст на $selectedLang: $question"}]
-            }
-            """.trimIndent()
-            val request = Request.Builder()
-                .url(url_api +"v1/chat/completions")
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "Bearer $apiKey")
-                .post(requestBody.trimIndent().toRequestBody("application/json".toMediaTypeOrNull()))
-                .build()
-            println(request.toString())
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    println("API failed")
-                    runOnUiThread { Toast.makeText(
-                        applicationContext,
-                        "К сожалению произошла ошибка. Проверьте соединение с интернетом или попробуйте позже. Количество запросов не уменьшено",
-                        Toast.LENGTH_SHORT
-                    ).show() }
-                    attemptsLeft += 1
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    val body = response.body?.string()
-                    if (body != null) {
-                        Log.v("data", body)
-                    } else {
-                        Log.v("data", "empty")
-                    }
-                    try {
-                        val jsonObject = JSONObject(body!!)
-                        val jsonArray = jsonObject.getJSONArray("choices")
-                        val test = jsonArray.getJSONObject(0)
-                        val message = test.getJSONObject("message")
-                        val final_res = message.getString("content")
-                        callback(final_res)
-                    } catch (e: JSONException) {
-                        println(body)
-                        println("HEADER "+ response.headers.toString())
-                        runOnUiThread { Toast.makeText(
-                            applicationContext,
-                            "К сожалению произошла ошибка. Проверьте соединение с интернетом или попробуйте позже. Количество запросов не уменьшено",
-                            Toast.LENGTH_SHORT
-                        ).show() }
-                        attemptsLeft += 1
-                    }
-                }
-            })
-          }
-        //Конец DeepL
-        }
         //КОНЕЦ ОТПРАВКИ ЗАПРОСОВ К АПИ===========================================================
         private fun loadRewardedAd() {
             val adRequestConfiguration = AdRequestConfiguration.Builder(reward_ad_id).build()
@@ -577,15 +426,10 @@ class MainActivity : AppCompatActivity() {
                show(this@MainActivity)
            }
     }
-
-
-
     override fun onDestroy() {
         super.onDestroy()
         Saver.Save(pref!!, attemptsLeft, was_recently_seen)
     }
-
-
 //КОНЦ MAIN ACTIVITY==================================================================================
 }
 

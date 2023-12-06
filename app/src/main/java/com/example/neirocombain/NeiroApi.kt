@@ -16,8 +16,8 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 
-class NeiroApi {
-    fun getResponse(question: String, client: OkHttpClient, msgList_FNL:MutableList<String>, mode: String, url_api:String,apiKey:String,vararg attemptsLeft: Int,selectedLang:String,callback: (String) -> Unit) { //Отправляем запрос
+class NeiroApi(var attemptsLeft: Int) {
+    fun getResponse(question: String, client: OkHttpClient, msgList_FNL:MutableList<String>, mode: String, url_api:String,apiKey:String,selectedLang:String,callback: (String) -> Unit) { //Отправляем запрос
         if (mode == "ChatGPT") {
 
             val last_symb = msgList_FNL.toString().length
@@ -38,7 +38,8 @@ class NeiroApi {
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     println("API failed")
-                    //attemptsLeft += 1
+                    println(e.printStackTrace())
+                    attemptsLeft += 1
                 }
                 override fun onResponse(call: Call, response: Response) {
                     val body = response.body?.string()
@@ -56,7 +57,7 @@ class NeiroApi {
                         callback(final_res)
                     } catch (e: JSONException) {
                         println(body)
-                       // attemptsLeft += 1
+                        attemptsLeft += 1
                     }
                 }
             })
@@ -83,7 +84,7 @@ class NeiroApi {
                         val imgUrl = jsonObject.getJSONArray("data").getJSONObject(0).getString("url")
                         println(imgUrl)
                         callback(imgUrl)
-                     //   attemptsLeft = 0
+                        attemptsLeft = 0
                     }catch (e:Exception){
                         e.printStackTrace()
                     }
@@ -109,8 +110,7 @@ class NeiroApi {
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     println("API failed")
-
-                   // attemptsLeft += 1
+                    attemptsLeft += 1
                 }
 
                 override fun onResponse(call: Call, response: Response) {
@@ -131,7 +131,7 @@ class NeiroApi {
                         println(body)
                         println("HEADER "+ response.headers.toString())
 
-                        //attemptsLeft += 1
+                        attemptsLeft += 1
                     }
                 }
             })

@@ -9,10 +9,10 @@ android {
 
 
     defaultConfig {
-        applicationId = "com.example.neirocombain"
+        applicationId = "com.bkmzdev.neirocombain"
         minSdk = 26
         targetSdk = 33
-        versionCode = 3
+        versionCode = 4
         versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
