@@ -116,7 +116,7 @@
         android:id="@+id/linearLayout2"
         android:layout_width="319dp"
         android:layout_height="52dp"
-        android:layout_marginTop="20sp"
+        android:layout_marginTop="100sp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@id/attemts"
         app:layout_constraintEnd_toEndOf="parent"
