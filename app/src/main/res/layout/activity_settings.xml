@@ -1,147 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Settings">
 
-    <RadioGroup
+
+    android:scrollbarSize="2dp"
+    android:scrollbarThumbVertical="@color/design_default_color_primary">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="234dp"
-        android:layout_marginTop="40dp"
-        android:paddingStart="10sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dropMenu">
+        android:layout_height="match_parent"
+        tools:context=".Settings">
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:paddingStart="10sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/dropMenu">
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="20sp"
+                android:text="Параметры ChatGPT"
+                android:textAlignment="center"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/temp_val"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Температура: 1"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Параметр, который определяет степень допуска к «творчеству» для этой нейронной сети. Его можно регулировать в диапазоне от 0 до 1, где: 0 – это запрет на вариативность; 1 – предоставление широкого доступа искусственного интеллекта к творчеству."
+                android:textSize="16sp" />
+
+            <SeekBar
+                android:id="@+id/temp_bar"
+                android:layout_width="match_parent"
+                android:layout_height="50sp" />
+
+            <TextView
+                android:id="@+id/temp_val2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Креативность: 1"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Чем выше значение, тем более вероятно, что ChatGPT начнет говорить на новые темы."
+                android:textSize="16sp" />
+
+            <SeekBar
+                android:id="@+id/creativity_bar"
+                android:layout_width="match_parent"
+                android:layout_height="50sp" />
+
+        </RadioGroup>
 
         <TextView
-            android:id="@+id/textView10"
-            android:layout_width="match_parent"
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="20sp"
-            android:text="Тема приложения"
-            android:textAlignment="center"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp" />
+            android:fontFamily="sans-serif-light"
+            android:text="Настройки"
+            android:textColor="#7034FF"
+            android:textSize="40sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.853"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.018" />
 
-        <RadioButton
-            android:id="@+id/radioButton2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="#FFFFFF"
-            android:text="Светлая"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
-
-        <RadioButton
-            android:id="@+id/radioButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="#FFFFFF"
-            android:text="Темная"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
-
-    </RadioGroup>
-
-    <TextView
-        android:id="@+id/textView8"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-light"
-        android:text="Настройки"
-        android:textColor="#7034FF"
-        android:textSize="40sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.853"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.018" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/dropMenu"
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
-        android:layout_width="348dp"
-        android:layout_height="63dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/dropMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu"
+            android:layout_width="305dp"
+            android:layout_height="67dp"
 
 
-        android:layout_marginTop="52dp"
-        android:gravity="clip_horizontal"
-        android:textColorHint="#FFFFFF"
-        android:visibility="visible"
-        app:boxStrokeWidth="0.5dp"
-        app:boxStrokeWidthFocused="1dp"
-        app:hintTextColor="#FFFFFF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView8"
-        app:prefixTextColor="#FFFFFF">
-
-
-        <AutoCompleteTextView
-            android:id="@+id/lang"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#121212"
-            android:foregroundTint="#FFFFFF"
-            android:inputType="none"
-            android:text="Язык приложения"
-            android:textAlignment="viewStart"
-            android:textColor="#FFFFFF"
+            android:layout_marginTop="52dp"
+            android:gravity="start"
             android:textColorHint="#FFFFFF"
-            android:textSize="18sp" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:visibility="visible"
+            app:boxStrokeWidth="0.5dp"
+            app:boxStrokeWidthFocused="1dp"
+            app:hintTextColor="#FFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView8"
+            app:prefixTextColor="#FFFFFF">
 
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="234dp"
-        android:paddingStart="10sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
 
-        <TextView
-            android:id="@+id/textView10"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Отправлять анонимную статистику разработчикам для поиска проблем?"
-            android:textAlignment="center"
+            <AutoCompleteTextView
+                android:id="@+id/lang"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#121212"
+                android:foregroundTint="#FFFFFF"
+                android:inputType="none"
+                android:text="Язык приложения"
+                android:textAlignment="gravity"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#FFFFFF"
+                android:textSize="18sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <RadioGroup
+            android:id="@+id/radioGroup2"
+            android:layout_width="wrap_content"
+            android:layout_height="173dp"
+            android:paddingStart="2sp"
+            android:paddingTop="25sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/radioGroup"
+            app:layout_constraintVertical_bias="0.0">
+
+            <TextView
+                android:id="@+id/sendinfotext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Отправлять анонимную статистику разработчикам для поиска проблем?"
+                android:textAlignment="center"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
+            <RadioButton
+                android:id="@+id/yes_report"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="#FFFFFF"
+                android:text="Да, я хочу сделать приложение лучше!"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+            <RadioButton
+                android:id="@+id/no_report"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:buttonTint="#FFFFFF"
+                android:text="Пожалуй откажусь"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+        </RadioGroup>
+
+        <ImageView
+            android:id="@+id/back_to_main"
+            android:layout_width="55dp"
+            android:layout_height="21dp"
+            android:layout_marginBottom="52dp"
+            app:layout_constraintBottom_toTopOf="@+id/dropMenu"
+            app:layout_constraintEnd_toStartOf="@+id/textView8"
+            app:layout_constraintHorizontal_bias="0.126"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.687"
+            app:srcCompat="@drawable/left_arr_invert" />
+
+        <Button
+            android:id="@+id/sumbit_settings"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="242dp"
+            android:layout_height="62dp"
+            android:layout_marginTop="25sp"
+            android:layout_marginBottom="5sp"
+            android:text="Применить"
             android:textColor="#FFFFFF"
-            android:textSize="20sp" />
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/radioGroup2" />
 
-        <RadioButton
-            android:id="@+id/radioButton2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="#FFFFFF"
-            android:text="Да, я хочу сделать приложение лучше!"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
-
-        <RadioButton
-            android:id="@+id/radioButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:buttonTint="#FFFFFF"
-            android:text="Пожалуй откажусь"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
-    </RadioGroup>
-
-    <ImageView
-        android:id="@+id/back_to_main"
-        android:layout_width="55dp"
-        android:layout_height="21dp"
-        android:layout_marginBottom="52dp"
-        app:layout_constraintBottom_toTopOf="@+id/dropMenu"
-        app:layout_constraintEnd_toStartOf="@+id/textView8"
-        app:layout_constraintHorizontal_bias="0.253"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.687"
-        app:srcCompat="@drawable/left_arr_invert" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

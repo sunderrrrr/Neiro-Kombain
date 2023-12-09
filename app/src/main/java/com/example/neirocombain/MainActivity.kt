@@ -150,7 +150,27 @@ class MainActivity : AppCompatActivity() {
 
         //КНОПКИ НАВИГАЦИИ================================
         left_btn.setOnClickListener{
-            if (selectedNl==2) {
+            /*runOnUiThread {
+                SelectNL(
+                    selectedNl,
+                    mode,
+                    nLinks,
+                    model,
+                    mainLO,
+                    attempts_text,
+                    messageRV,
+                    dropMenu,
+                    messageRVAdapter,
+                    messageList,
+                    DeepLList,
+                    txtResponse,
+                    isFirstGPT,
+                    isFirstDalle,
+                    isFirstDeepL,
+                    image
+                ).MoveLeft(this)
+            }*/
+           if (selectedNl==2) {
                 Timer().schedule(150) {
                     selectedNl = 1
                     println("ВТОРИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА В ЖПТ")
@@ -224,7 +244,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-
         }
         right_btn.setOnClickListener{
             if (selectedNl==2) {
