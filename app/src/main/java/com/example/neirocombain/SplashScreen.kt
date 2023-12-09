@@ -1,9 +1,9 @@
 package com.example.neirocombain
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatActivity
 import com.yandex.mobile.ads.common.MobileAds
 
 @Suppress("DEPRECATION")

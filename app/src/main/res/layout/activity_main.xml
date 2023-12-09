@@ -60,7 +60,7 @@
 
             android:background="#00FFFFFF"
             android:breakStrategy="high_quality"
-            android:fontFamily="sans-serif"
+            android:fontFamily="sans-serif-light"
             android:overScrollMode="always"
             android:paddingTop="20sp"
             android:scrollIndicators="right"
@@ -116,7 +116,7 @@
         android:id="@+id/linearLayout2"
         android:layout_width="319dp"
         android:layout_height="52dp"
-        android:layout_marginTop="100sp"
+        android:layout_marginTop="70sp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@id/attemts"
         app:layout_constraintEnd_toEndOf="parent"
@@ -138,6 +138,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/neiro_bg"
+            android:fontFamily="sans-serif-light"
             android:paddingVertical="8dp"
             android:text="ChatGPT"
             android:textAlignment="center"
@@ -160,9 +161,9 @@
         android:id="@+id/attemts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25sp"
+        android:layout_marginTop="20sp"
         android:layout_marginBottom="10dp"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-light"
         android:paddingTop="5sp"
         android:text="3/3"
         android:textAlignment="center"
@@ -183,7 +184,7 @@
         android:background="@drawable/corner"
 
         android:ems="10"
-        android:fontFamily="sans-serif"
+        android:fontFamily="sans-serif-light"
         android:hint="Запрос"
         android:imeOptions="actionSend"
         android:inputType="text"
@@ -198,5 +199,19 @@
         app:layout_constraintTop_toBottomOf="@+id/main"
         app:layout_constraintVertical_bias="0.782"
         tools:ignore="HardcodedText" />
+
+    <ImageView
+        android:id="@+id/settings"
+        android:layout_width="127dp"
+        android:layout_height="39dp"
+        android:layout_marginStart="292dp"
+        android:layout_marginEnd="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.285"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.032"
+        app:srcCompat="@drawable/settings" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

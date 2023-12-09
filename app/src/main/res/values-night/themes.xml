@@ -6,7 +6,6 @@
         <item name="android:statusBarColor">#121212</item>
         <item name="android:background">#121212</item>
         <item name="android:windowIsTranslucent">true</item>
-
     </style>
     
     <style name="TextInputLayoutStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">

@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.neirocombain.R
 
 class MessageRVAdapter(private val messageList: ArrayList<MessageRVModal>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {

@@ -6,6 +6,7 @@ package com.example.neirocombain
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
@@ -20,6 +21,7 @@ import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
@@ -48,8 +50,8 @@ class MainActivity : AppCompatActivity() {
     private var DEBUG_MODE = false//ВЫКЛ ВКЛ ДЕБАГ
     val url_api = "https://api.proxyapi.ru/openai/" // v1/chat/completions
     val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
-    val reward_ad_id = "R-M-4088559-2"
-    val banner_ad_id = "R-M-4088559-1"
+    val reward_ad_id = "R-M-4312016-2"
+    val banner_ad_id = "R-M-4312016-1"
     lateinit var txtResponse: TextView
     private var rewardedAd: RewardedAd? = null
     private var rewardedAdLoader: RewardedAdLoader? = null
@@ -108,7 +110,12 @@ class MainActivity : AppCompatActivity() {
         messageRV.adapter = messageRVAdapter
         //Update.check(this, was_recently_seen)
         //ВЫБОР ЯЗЫКОВ
+        val back_btn = findViewById<ImageView>(R.id.settings)
+        back_btn.setOnClickListener{
+            val intent1 = Intent(this, Settings::class.java)
+            ContextCompat.startActivity(this, intent1, null)
 
+        }
         val languages = resources.getStringArray(R.array.lang_array)
         val arrayAdapter = ArrayAdapter(/* context = */ this, /* resource = */ R.layout.dropdown_item, /* objects = */ languages)
         langTV.setAdapter(arrayAdapter)
@@ -133,7 +140,7 @@ class MainActivity : AppCompatActivity() {
         MobileInstreamAds.setAdGroupPreloading(true)
         MobileAds.enableLogging(true)
         banner.setAdUnitId(banner_ad_id)// BANER
-        banner.setAdSize(BannerAdSize.fixedSize(this, 320, 80))
+        banner.setAdSize(BannerAdSize.fixedSize(this, 320, 90))
             val adRequest: AdRequest = Builder().build()
         banner.run {
             println(adRequest)
@@ -394,13 +401,14 @@ class MainActivity : AppCompatActivity() {
     }
         //КОНЕЦ ОТПРАВКИ ЗАПРОСОВ К АПИ===========================================================
         private fun loadRewardedAd() {
-            val adRequestConfiguration = AdRequestConfiguration.Builder(reward_ad_id).build()
+            val adRequestConfiguration = AdRequestConfiguration.Builder("R-M-4312016-3").build()
             rewardedAdLoader?.loadAd(adRequestConfiguration)
         }
        private fun showAd() {
            rewardedAd?.apply {
                setAdEventListener(object : RewardedAdEventListener {
                    override fun onAdShown() {
+                       println("AD SHOWn")
                    }
                    override fun onAdFailedToShow(adError: AdError) {
                        runOnUiThread { Toast.makeText(
