@@ -64,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="A01"
+            android:text="A02"
             android:textColor="#FFFFFF"
             android:textSize="22sp" />
 

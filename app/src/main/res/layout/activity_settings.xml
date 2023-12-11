@@ -53,7 +53,10 @@
             <SeekBar
                 android:id="@+id/temp_bar"
                 android:layout_width="match_parent"
-                android:layout_height="50sp" />
+                android:layout_height="50sp"
+                android:max="10"
+                android:progress="0"
+                />
 
             <TextView
                 android:id="@+id/temp_val2"

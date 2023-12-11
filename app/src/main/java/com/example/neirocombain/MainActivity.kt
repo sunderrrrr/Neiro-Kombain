@@ -6,7 +6,6 @@ package com.example.neirocombain
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
@@ -15,16 +14,20 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.banner.BannerAdView
 import com.yandex.mobile.ads.common.AdError
@@ -41,6 +44,7 @@ import com.yandex.mobile.ads.rewarded.RewardedAdEventListener
 import com.yandex.mobile.ads.rewarded.RewardedAdLoadListener
 import com.yandex.mobile.ads.rewarded.RewardedAdLoader
 import okhttp3.OkHttpClient
+import java.lang.reflect.Type
 import java.util.Timer
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
@@ -50,7 +54,7 @@ class MainActivity : AppCompatActivity() {
     private var DEBUG_MODE = false//ВЫКЛ ВКЛ ДЕБАГ
     val url_api = "https://api.proxyapi.ru/openai/" // v1/chat/completions
     val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
-    val reward_ad_id = "R-M-4312016-2"
+    val reward_ad_id = "R-M-4312016-3"
     val banner_ad_id = "R-M-4312016-1"
     lateinit var txtResponse: TextView
     private var rewardedAd: RewardedAd? = null
@@ -79,13 +83,19 @@ class MainActivity : AppCompatActivity() {
     var isFirstDalle = true
     var pref: SharedPreferences? = null
     val Saver = SaveData()
+    val gson = Gson()
+    lateinit var appUpdateManager: AppUpdateManager
+
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         //ИНИЦИАЛИЗАЦИЯ=========================================
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
+        Updater(appUpdateManager).checlForUpdates(this)
         pref = this.getSharedPreferences("shared", Context.MODE_PRIVATE)!!
         etQuestion=findViewById(R.id.request)
         val left_btn = findViewById<ImageView>(R.id.leftarr)
@@ -94,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         val banner = findViewById<BannerAdView>(R.id.banner)
         val layoutManager = LinearLayoutManager(applicationContext)
         val mainLO = findViewById<LinearLayout>(R.id.main)
+        val reset_btn = findViewById<ImageButton>(R.id.reset_msg)
         image = findViewById(R.id.image)
         val langTV = findViewById<AutoCompleteTextView>(R.id.lang)
         val dropMenu = findViewById<TextInputLayout>(R.id.dropMenu)
@@ -101,9 +112,18 @@ class MainActivity : AppCompatActivity() {
         attempts_text = findViewById(R.id.attemts)
         messageRV = findViewById(R.id.msgRV)
         attemptsLeft = pref?.getInt("attempts", 3)!!
-        was_recently_seen = pref?.getBoolean("wrs", false)!!
         attempts_text.text = attemptsLeft.toString() +"/3"
-        messageList = ArrayList()
+        val json = pref?.getString("ui_msg", null)
+        println("JSON SAVE = "+ json)
+        val type: Type = object : TypeToken<ArrayList<MessageRVModal>>() {}.type
+        println("TYPE = "+type)
+        if (json != null && json!=""){messageList = gson.fromJson<Any>(json, type) as ArrayList<MessageRVModal> }
+        else{
+            println("ДЕФОЛТНЫЙ СПИСОК")
+            messageList = ArrayList()}
+        //messageList = gson.fromJson<Any>(json, type) as ArrayList<MessageRVModal>
+        val temp=intent.getStringExtra("temp")
+        println("TEMP = $temp")
         DeepLList = ArrayList()
         messageRV.layoutManager = layoutManager
         messageRVAdapter = MessageRVAdapter(messageList)
@@ -112,9 +132,17 @@ class MainActivity : AppCompatActivity() {
         //ВЫБОР ЯЗЫКОВ
         val back_btn = findViewById<ImageView>(R.id.settings)
         back_btn.setOnClickListener{
-            val intent1 = Intent(this, Settings::class.java)
-            ContextCompat.startActivity(this, intent1, null)
-
+            //val intent1 = Intent(this, Settings::class.java)
+            //ContextCompat.startActivity(this, intent1, null)
+            Toast.makeText(applicationContext, "Что же там?", Toast.LENGTH_SHORT).show()
+        }
+        reset_btn.setOnClickListener {
+            messageList.clear()
+            messageRV.layoutManager = layoutManager
+            messageRVAdapter = MessageRVAdapter(messageList)
+            messageRV.adapter = messageRVAdapter
+            msgList_FNL.clear()
+            Toast.makeText(applicationContext, "История сообщений сброшена!", Toast.LENGTH_SHORT).show()
         }
         val languages = resources.getStringArray(R.array.lang_array)
         val arrayAdapter = ArrayAdapter(/* context = */ this, /* resource = */ R.layout.dropdown_item, /* objects = */ languages)
@@ -150,26 +178,7 @@ class MainActivity : AppCompatActivity() {
 
         //КНОПКИ НАВИГАЦИИ================================
         left_btn.setOnClickListener{
-            /*runOnUiThread {
-                SelectNL(
-                    selectedNl,
-                    mode,
-                    nLinks,
-                    model,
-                    mainLO,
-                    attempts_text,
-                    messageRV,
-                    dropMenu,
-                    messageRVAdapter,
-                    messageList,
-                    DeepLList,
-                    txtResponse,
-                    isFirstGPT,
-                    isFirstDalle,
-                    isFirstDeepL,
-                    image
-                ).MoveLeft(this)
-            }*/
+
            if (selectedNl==2) {
                 Timer().schedule(150) {
                     selectedNl = 1
@@ -322,43 +331,42 @@ class MainActivity : AppCompatActivity() {
         //КОНЕЦ КНОПОК НАВИГАЦИИ================================
 
         //Блок отправки сообщений========================
-        var isConnected = connectionChecker.checkConnection(this)
+
         etQuestion.setOnEditorActionListener(OnEditorActionListener{ textView, i, keyEvent ->
+            println(messageList)
             if (i==EditorInfo.IME_ACTION_SEND && !DEBUG_MODE) {
-                isConnected = connectionChecker.checkConnection(this)
-                val final_send = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
+
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 val question = edittextval.replace(" ", "")
-                if (attemptsLeft > 0 && isConnected) {
+                if (attemptsLeft > 0 && connectionChecker.checkConnection(this)) {
                     txtResponse.visibility = View.GONE
                     messageRV.visibility = View.VISIBLE
-                    isConnected = connectionChecker.checkConnection(this)
-                    if (question.isNotEmpty() && question.length >= 5 && !isSended && isConnected) {
+
+                    if (question.isNotEmpty() && question.length >= 5 && !isSended && connectionChecker.checkConnection(this)) {
+                        isSended = true
                         if (mode == "ChatGPT") {
-                            val user_mask = """{"role": "user", "content" :"$final_send"}"""
+                            val user_mask = """{"role": "user", "content" :"$edittextval"}"""
                             msgList_FNL.add(user_mask) //Сообщение для апи
-                            messageList.add(MessageRVModal(final_send, "user"))//Сообщение для чата
+                            messageList.add(MessageRVModal(edittextval, "user"))//Сообщение для чата
                             messageRVAdapter.notifyDataSetChanged()
-                            isSended = true
                             isFirstGPT = false
                             etQuestion.setText("")
                             messageList.add(MessageRVModal("Печатает...", "bot"))
+                            messageRV.smoothScrollToPosition(messageRVAdapter.itemCount)
                             //Отправляем строку в функцию
                             NeiroApi(attemptsLeft).getResponse(question, client, msgList_FNL, mode, url_api, apiKey,selectedLang) { response ->
                                 runOnUiThread {
                                     messageRV.visibility = View.VISIBLE
                                     messageList.removeLast()
-                                    var response_to_list = response.replace("\n", "")
-                                    response_to_list = response_to_list.replace("\"", "'")
+                                    val response_to_list = response.replace("\n", "").replace("\"", "'")
                                     messageList.add(MessageRVModal(response, "bot"))
                                     messageRVAdapter.run { notifyDataSetChanged() }
                                     messageRV.smoothScrollToPosition(messageRVAdapter.itemCount)
-                                    println("МАССИВ $messageList")
                                     val nl_mask = """{"role": "assistant", "content" :"$response_to_list"}"""
                                     msgList_FNL.add(nl_mask)
                                     attemptsLeft -= 1
                                     attempts_text.text = "$attemptsLeft/3"
-                                    Saver.Save(pref!!, attemptsLeft, was_recently_seen)
+                                    Saver.Save(pref!!, attemptsLeft, was_recently_seen, messageList)
                                 }
                                 //КОНЕЦ UI ПОТОКА
                             }
@@ -380,47 +388,37 @@ class MainActivity : AppCompatActivity() {
                             txtResponse.visibility = View.GONE
                             isFirstDeepL = false
                             messageRV.visibility = View.VISIBLE
-                            DeepLList.add(MessageRVModal(final_send, "user"))
+                            DeepLList.add(MessageRVModal(edittextval, "user"))
                             messageRVAdapter.run { notifyDataSetChanged() }
                             DeepLList.add(MessageRVModal("Печатает...", "bot"))
+                            messageRV.smoothScrollToPosition(messageRVAdapter.itemCount)
                             NeiroApi(attemptsLeft).getResponse(question, client, msgList_FNL, mode, url_api, apiKey,selectedLang) { response ->
                                 runOnUiThread {
-                                    println(response)
-                                    println("ОТВЕТ ПОЛУЧЕН")
                                     DeepLList.removeLast()
                                     DeepLList.add(MessageRVModal(response, "bot"))
-                                    println(DeepLList)
                                     attemptsLeft -= 1
                                     attempts_text.text = "$attemptsLeft/3"
                                     messageRVAdapter.notifyDataSetChanged()
                                 }
                             }
                         }
-                        if(!isLangSelected && mode=="DeepL"){
-                            Toast.makeText(applicationContext, "Вы не выбрали язык", Toast.LENGTH_SHORT).show()
-                        }
+                        if(!isLangSelected && mode=="DeepL"){ Toast.makeText(applicationContext, "Вы не выбрали язык", Toast.LENGTH_SHORT).show() }
 
                     } else {
                         if (isSended) { Toast.makeText(applicationContext, "Вы уже отправили запрос! Дождитесь ответа", Toast.LENGTH_SHORT).show() }
                     }
                 }
-                if (attemptsLeft == 0 && isConnected) {
+                if (attemptsLeft == 0 && connectionChecker.checkConnection(this)) {
                     Toast.makeText(applicationContext, "Количество запросов исчерпано. После воспроизведения рекламы они восстановятся", Toast.LENGTH_SHORT).show()
-                    showAd()
-                    println("Реклама показывается")
-                } }
-            if (!isConnected){
-                Toast.makeText(applicationContext, "Проверьте соединение с интернетом", Toast.LENGTH_SHORT).show()
-            }
+                    showAd() } }
+            if (!connectionChecker.checkConnection(this)){ Toast.makeText(applicationContext, "Проверьте соединение с интернетом", Toast.LENGTH_SHORT).show() }
             if (DEBUG_MODE){ Toast.makeText(applicationContext, "Эта версия предназначена для проверки дизайна и не имеет функционала", Toast.LENGTH_SHORT).show() }
         false
         })
-        //КОНЕЦ ОТПРАВКИ ЗАПРОСА
-        //КОНЕЦ КЛАССА OnCreate и UI потока
     }
         //КОНЕЦ ОТПРАВКИ ЗАПРОСОВ К АПИ===========================================================
         private fun loadRewardedAd() {
-            val adRequestConfiguration = AdRequestConfiguration.Builder("R-M-4312016-3").build()
+            val adRequestConfiguration = AdRequestConfiguration.Builder(reward_ad_id).build()
             rewardedAdLoader?.loadAd(adRequestConfiguration)
         }
        private fun showAd() {
@@ -447,16 +445,39 @@ class MainActivity : AppCompatActivity() {
                        // Called when the user can be rewarded.
                        attemptsLeft = 3
                        attempts_text.text = "$attemptsLeft/3"
-                       Saver.Save(pref!!, attemptsLeft, was_recently_seen)
+                       Saver.Save(pref!!, attemptsLeft, was_recently_seen, messageList)
                    }
                })
                show(this@MainActivity)
            }
     }
+    /*fun checlForUpdates(){
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
+            val isUpdateAvailable = info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+            val isUpdateSupported = when(updateType){
+                AppUpdateType.IMMEDIATE -> info.isImmediateUpdateAllowed
+                else -> false
+            }
+            if(isUpdateSupported && isUpdateAvailable){
+                println("ПОЯВИЛОСЬ ОБНОВЛЕНИЕ И ОНО ПОДДЕЖИВАЕТСЯ")
+                appUpdateManager.startUpdateFlowForResult(info, updateType, this@MainActivity, 123)
+            }
+            else{
+                println("ОБНОВЛЕНИЙ НЕТ")
+            }
+        }
+    }*/
+    override fun onResume() {
+        super.onResume()
+        Updater(appUpdateManager).resunmeUpdate(this)
+
+    }
     override fun onDestroy() {
         super.onDestroy()
-        Saver.Save(pref!!, attemptsLeft, was_recently_seen)
+        Saver.Save(pref!!, attemptsLeft, was_recently_seen, messageList)
     }
+
+
 //КОНЦ MAIN ACTIVITY==================================================================================
 }
 

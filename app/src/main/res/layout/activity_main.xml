@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="439dp"
         android:layout_marginTop="100dp"
-        android:background="#121212"
+        android:background="#00121212"
         android:orientation="vertical"
         android:paddingStart="20sp"
         android:paddingEnd="20sp"
@@ -102,7 +102,7 @@
     <com.yandex.mobile.ads.banner.BannerAdView
         android:id="@+id/banner"
         android:layout_width="359dp"
-        android:layout_height="81dp"
+        android:layout_height="70dp"
         android:layout_marginBottom="10dp"
         android:background="#00FFFFFF"
         android:gravity="center_horizontal"
@@ -117,6 +117,7 @@
         android:layout_width="319dp"
         android:layout_height="52dp"
         android:layout_marginTop="70sp"
+        android:background="#00FFFFFF"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@id/attemts"
         app:layout_constraintEnd_toEndOf="parent"
@@ -130,6 +131,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10sp"
             android:layout_marginBottom="10sp"
+            android:background="#00FFFFFF"
             app:srcCompat="@drawable/left_arr_invert" />
 
         <TextView
@@ -153,6 +155,7 @@
             android:layout_marginTop="10sp"
             android:layout_marginBottom="10sp"
             android:layout_weight="1"
+            android:background="#00FFFFFF"
             app:srcCompat="@drawable/right_arr_invert" />
 
     </LinearLayout>
@@ -163,6 +166,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20sp"
         android:layout_marginBottom="10dp"
+        android:background="#00FFFFFF"
         android:fontFamily="sans-serif-light"
         android:paddingTop="5sp"
         android:text="3/3"
@@ -179,10 +183,11 @@
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/request"
         style="@android:style/Widget.Holo.Light.EditText"
-        android:layout_width="342dp"
-        android:layout_height="54dp"
-        android:background="@drawable/corner"
+        android:layout_width="346dp"
+        android:layout_height="61dp"
 
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/corner"
         android:ems="10"
         android:fontFamily="sans-serif-light"
         android:hint="Запрос"
@@ -196,8 +201,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main"
-        app:layout_constraintVertical_bias="0.782"
+        app:layout_constraintTop_toBottomOf="@+id/banner"
+        app:layout_constraintVertical_bias="0.65999997"
         tools:ignore="HardcodedText" />
 
     <ImageView
@@ -206,6 +211,7 @@
         android:layout_height="39dp"
         android:layout_marginStart="292dp"
         android:layout_marginEnd="20sp"
+        android:background="#00FFFFFF"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.285"
@@ -213,5 +219,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.032"
         app:srcCompat="@drawable/settings" />
+
+    <ImageButton
+        android:id="@+id/reset_msg"
+        android:layout_width="40dp"
+        android:layout_height="34dp"
+        android:layout_marginEnd="199dp"
+        android:background="#00FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toStartOf="@+id/settings"
+        app:layout_constraintHorizontal_bias="0.695"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.75"
+        app:srcCompat="@drawable/reload" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
