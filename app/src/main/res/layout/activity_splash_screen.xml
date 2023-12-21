@@ -64,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="A02"
+            android:text="A04"
             android:textColor="#FFFFFF"
             android:textSize="22sp" />
 
@@ -74,6 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="62dp"
             android:layout_marginTop="40sp"
+            android:indeterminate="false"
             android:progressTint="#FFFFFF"
             android:visibility="visible" />
 

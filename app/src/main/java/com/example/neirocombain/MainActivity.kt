@@ -52,39 +52,39 @@ import kotlin.concurrent.schedule
 
 class MainActivity : AppCompatActivity() {
     private var DEBUG_MODE = false//ВЫКЛ ВКЛ ДЕБАГ
-    val url_api = "https://api.proxyapi.ru/openai/" // v1/chat/completions
-    val apiKey = "sk-tTpyI6t2yLieHQTmXsLFiorT1Z66seo9"
-    val reward_ad_id = "R-M-4312016-3"
-    val banner_ad_id = "R-M-4312016-1"
-    lateinit var txtResponse: TextView
+    private val url_api = "https://api.proxyapi.ru/openai/" // v1/chat/completions
+    private val apiKey = "sk-PumVBSKFnaHTR2u5QfK3qopF3sDxOBsr"
+    private val reward_ad_id = "R-M-4312016-3"
+    private val banner_ad_id = "R-M-4312016-1"
+    private lateinit var txtResponse: TextView
     private var rewardedAd: RewardedAd? = null
     private var rewardedAdLoader: RewardedAdLoader? = null
-    lateinit var etQuestion: EditText
+    private lateinit var etQuestion: EditText
     lateinit var attempts_text: TextView
-    lateinit var edittextval: String
-    lateinit var messageRV: RecyclerView
-    lateinit var image: ImageView
-    lateinit var messageRVAdapter: MessageRVAdapter
+    private lateinit var edittextval: String
+    private lateinit var messageRV: RecyclerView
+    private lateinit var image: ImageView
+    private lateinit var messageRVAdapter: MessageRVAdapter
     lateinit var messageList: ArrayList<MessageRVModal>
-    lateinit var DeepLList: ArrayList<MessageRVModal>
+    private lateinit var DeepLList: ArrayList<MessageRVModal>
     private val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build()
-    var mode = "ChatGPT"
-    var selectedNl = 1
-    var msgList_FNL = mutableListOf<String>()
-    var selectedLang = ""
+    private var mode = "ChatGPT"
+    private var selectedNl = 1
+    private var msgList_FNL = mutableListOf<String>()
+    private var selectedLang = ""
     var attemptsLeft: Int = 0
-    val connectionChecker = InternetConnection()
+    private val connectionChecker = InternetConnection()
     var was_recently_seen = false
-    val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL")
-    var isSended = false
-    var isFirstGPT = true
-    var isLangSelected = false
-    var isFirstDeepL = true
-    var isFirstDalle = true
+    private val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL")
+    private var isSended = false
+    private var isFirstGPT = true
+    private var isLangSelected = false
+    private var isFirstDeepL = true
+    private var isFirstDalle = true
     var pref: SharedPreferences? = null
     val Saver = SaveData()
-    val gson = Gson()
-    lateinit var appUpdateManager: AppUpdateManager
+    private val gson = Gson()
+    private lateinit var appUpdateManager: AppUpdateManager
 
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
 
@@ -112,28 +112,28 @@ class MainActivity : AppCompatActivity() {
         attempts_text = findViewById(R.id.attemts)
         messageRV = findViewById(R.id.msgRV)
         attemptsLeft = pref?.getInt("attempts", 3)!!
-        attempts_text.text = attemptsLeft.toString() +"/3"
+        attempts_text.text = "$attemptsLeft/3"
         val json = pref?.getString("ui_msg", null)
         println("JSON SAVE = "+ json)
         val type: Type = object : TypeToken<ArrayList<MessageRVModal>>() {}.type
         println("TYPE = "+type)
-        if (json != null && json!=""){messageList = gson.fromJson<Any>(json, type) as ArrayList<MessageRVModal> }
-        else{
+        messageList = if ((json != null) && (json != "")){
+            gson.fromJson<Any>(json, type) as ArrayList<MessageRVModal>
+        } else{
             println("ДЕФОЛТНЫЙ СПИСОК")
-            messageList = ArrayList()}
-        //messageList = gson.fromJson<Any>(json, type) as ArrayList<MessageRVModal>
+            ArrayList()
+        }
+
         val temp=intent.getStringExtra("temp")
         println("TEMP = $temp")
         DeepLList = ArrayList()
         messageRV.layoutManager = layoutManager
         messageRVAdapter = MessageRVAdapter(messageList)
         messageRV.adapter = messageRVAdapter
-        //Update.check(this, was_recently_seen)
         //ВЫБОР ЯЗЫКОВ
         val back_btn = findViewById<ImageView>(R.id.settings)
         back_btn.setOnClickListener{
-            //val intent1 = Intent(this, Settings::class.java)
-            //ContextCompat.startActivity(this, intent1, null)
+
             Toast.makeText(applicationContext, "Что же там?", Toast.LENGTH_SHORT).show()
         }
         reset_btn.setOnClickListener {
@@ -182,7 +182,6 @@ class MainActivity : AppCompatActivity() {
            if (selectedNl==2) {
                 Timer().schedule(150) {
                     selectedNl = 1
-                    println("ВТОРИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА В ЖПТ")
                     mode = nLinks[selectedNl]
                     runOnUiThread {
                         model.alpha = 0f
@@ -242,7 +241,6 @@ class MainActivity : AppCompatActivity() {
                         if(isFirstDeepL){
                             txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
-                        println("ВТОРИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА В ДИПЛ")
                         messageRVAdapter = MessageRVAdapter(DeepLList)
                         messageRV.adapter = messageRVAdapter
                         image.visibility=View.GONE
@@ -293,7 +291,6 @@ class MainActivity : AppCompatActivity() {
                         dropMenu.visibility = View.VISIBLE
                         if(isFirstDeepL){ txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
-                        println("ВТОРИЧНАЯ ИНИЦИАЛИЗАЦИЯ АДАПТЕРА В ДИПЛ")
                         messageRVAdapter = MessageRVAdapter(DeepLList)
                         messageRV.adapter = messageRVAdapter
                         image.visibility=View.GONE
@@ -376,13 +373,7 @@ class MainActivity : AppCompatActivity() {
                             isFirstDalle = false
                             messageRV.visibility = View.GONE
                             Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT).show()
-                            /*image.visibility = View.VISIBLE
-                            getResponse(final_send) { response ->
-                                DownloadImageTask123(image).execute(response)
-                                attemptsLeft = 0
-                                attempts_text.text = "$attemptsLeft/3"
-                                showAd()
-                            }*/
+
                         }
                         if (mode == "DeepL" && isLangSelected) {
                             txtResponse.visibility = View.GONE
@@ -404,14 +395,14 @@ class MainActivity : AppCompatActivity() {
                         }
                         if(!isLangSelected && mode=="DeepL"){ Toast.makeText(applicationContext, "Вы не выбрали язык", Toast.LENGTH_SHORT).show() }
 
-                    } else {
-                        if (isSended) { Toast.makeText(applicationContext, "Вы уже отправили запрос! Дождитесь ответа", Toast.LENGTH_SHORT).show() }
-                    }
+                    } else if (isSended) { Toast.makeText(applicationContext, "Вы уже отправили запрос! Дождитесь ответа", Toast.LENGTH_SHORT).show() }
                 }
                 if (attemptsLeft == 0 && connectionChecker.checkConnection(this)) {
                     Toast.makeText(applicationContext, "Количество запросов исчерпано. После воспроизведения рекламы они восстановятся", Toast.LENGTH_SHORT).show()
                     showAd() } }
-            if (!connectionChecker.checkConnection(this)){ Toast.makeText(applicationContext, "Проверьте соединение с интернетом", Toast.LENGTH_SHORT).show() }
+            when {
+                !connectionChecker.checkConnection(this) -> { Toast.makeText(applicationContext, "Проверьте соединение с интернетом", Toast.LENGTH_SHORT).show() }
+            }
             if (DEBUG_MODE){ Toast.makeText(applicationContext, "Эта версия предназначена для проверки дизайна и не имеет функционала", Toast.LENGTH_SHORT).show() }
         false
         })
@@ -451,22 +442,6 @@ class MainActivity : AppCompatActivity() {
                show(this@MainActivity)
            }
     }
-    /*fun checlForUpdates(){
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { info ->
-            val isUpdateAvailable = info.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-            val isUpdateSupported = when(updateType){
-                AppUpdateType.IMMEDIATE -> info.isImmediateUpdateAllowed
-                else -> false
-            }
-            if(isUpdateSupported && isUpdateAvailable){
-                println("ПОЯВИЛОСЬ ОБНОВЛЕНИЕ И ОНО ПОДДЕЖИВАЕТСЯ")
-                appUpdateManager.startUpdateFlowForResult(info, updateType, this@MainActivity, 123)
-            }
-            else{
-                println("ОБНОВЛЕНИЙ НЕТ")
-            }
-        }
-    }*/
     override fun onResume() {
         super.onResume()
         Updater(appUpdateManager).resunmeUpdate(this)
