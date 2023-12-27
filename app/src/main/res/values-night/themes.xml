@@ -3,8 +3,8 @@
     <style name="Base.Theme.NeiroCombain" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <item name="colorPrimary">#7034FF</item>
-        <item name="android:statusBarColor">#121212</item>
-        <item name="android:background">#121212</item>
+        <item name="android:statusBarColor">#0C0C0C</item>
+        <item name="android:background">#0C0C0C</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
     

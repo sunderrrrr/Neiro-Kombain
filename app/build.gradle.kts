@@ -12,15 +12,15 @@ android {
         applicationId = "com.bkmzdev.neirocombain"
         minSdk = 26
         targetSdk = 33
-        versionCode = 7
-        versionName = "1.1.4"
+        versionCode = 9
+        versionName = "1.1.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -34,7 +34,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-
+    lintOptions {
+        disable("MobileAdsSdkOutdatedVersion")
+    }
 }
 
 dependencies {
@@ -51,4 +53,5 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation("com.google.firebase:firebase-messaging:20.1.0")
 }

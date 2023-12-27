@@ -63,6 +63,49 @@ class NeiroApi(var attemptsLeft: Int) {
             })
         }
         //Конец ChatGPT=======================================================================
+
+        if (mode == "GigaChat") {
+
+            val last_symb = msgList_FNL.toString().length
+            val msg_req = msgList_FNL.toString().substring(1..last_symb - 2)
+            val requestBody = """
+            {
+                "model": "GigaChat:latest",
+                "messages": [$msg_req]     
+            }
+            """.trimIndent()
+            println("REQUESRT BODY$requestBody")
+            val request = Request.Builder()
+                .url("https://gigachat.devices.sberbank.ru/api/v1/chat/completions")
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", "Bearer d542cc68-5145-4e83-9539-af8bdc2cfa53")
+                .post(requestBody.trimIndent().toRequestBody("application/json".toMediaTypeOrNull())).build()
+            println(request.toString())
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    println("API failed")
+                    println(e.printStackTrace())
+                    attemptsLeft += 1
+                }
+                override fun onResponse(call: Call, response: Response) {
+                    val body = response.body?.string()
+                    if (body != null) {
+                        Log.v("data", body)
+                    } else {
+                        Log.v("data", "empty")
+                    }
+                    try {
+
+                        callback("final_res")
+                    } catch (e: JSONException) {
+                        println(body)
+                        attemptsLeft += 1
+                    }
+                }
+            })
+        }
+
+
         if (mode == "DALLE-E") {
             val JSONbody = JSONObject()
             try{

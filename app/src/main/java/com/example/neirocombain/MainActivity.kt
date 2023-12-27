@@ -1,4 +1,4 @@
-@file:Suppress("SpellCheckingInspection")
+@file:Suppress("SpellCheckingInspection", "PropertyName", "ImplicitThis")
 
 package com.example.neirocombain
 
@@ -6,8 +6,10 @@ package com.example.neirocombain
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
@@ -67,20 +69,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var messageRVAdapter: MessageRVAdapter
     lateinit var messageList: ArrayList<MessageRVModal>
     private lateinit var DeepLList: ArrayList<MessageRVModal>
+    private lateinit var GigaChatList: ArrayList<MessageRVModal>
     private val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).writeTimeout(10, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).build()
-    private var mode = "ChatGPT"
+    private var mode = "ChatGPT" //Режим по умолчанию
     private var selectedNl = 1
     private var msgList_FNL = mutableListOf<String>()
+    private var SberList_FNL = mutableListOf<String>()
     private var selectedLang = ""
     var attemptsLeft: Int = 0
     private val connectionChecker = InternetConnection()
     var was_recently_seen = false
-    private val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL")
+    private val nLinks = listOf("DALLE-E", "ChatGPT", "DeepL", "GigaChat")
     private var isSended = false
     private var isFirstGPT = true
     private var isLangSelected = false
     private var isFirstDeepL = true
     private var isFirstDalle = true
+    private var isFirstGigaChat = true
     var pref: SharedPreferences? = null
     val Saver = SaveData()
     private val gson = Gson()
@@ -90,14 +95,11 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         //ИНИЦИАЛИЗАЦИЯ=========================================
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
-        Updater(appUpdateManager).checlForUpdates(this)
-        pref = this.getSharedPreferences("shared", Context.MODE_PRIVATE)!!
-        etQuestion=findViewById(R.id.request)
+        Updater(appUpdateManager).checlForUpdates(this)//Проверка обновлений
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
         val model = findViewById<TextView>(R.id.model)
@@ -105,36 +107,41 @@ class MainActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(applicationContext)
         val mainLO = findViewById<LinearLayout>(R.id.main)
         val reset_btn = findViewById<ImageButton>(R.id.reset_msg)
-        image = findViewById(R.id.image)
-        val langTV = findViewById<AutoCompleteTextView>(R.id.lang)
+        val back_btn = findViewById<ImageView>(R.id.settings)
+        val langTV = findViewById<AutoCompleteTextView>(R.id.SettingsLangTV)
         val dropMenu = findViewById<TextInputLayout>(R.id.dropMenu)
+        pref = this.getSharedPreferences("shared", Context.MODE_PRIVATE)!!
+        etQuestion=findViewById(R.id.request)
+        image = findViewById(R.id.image)
         txtResponse=findViewById(R.id.desc)
         attempts_text = findViewById(R.id.attemts)
         messageRV = findViewById(R.id.msgRV)
         attemptsLeft = pref?.getInt("attempts", 3)!!
         attempts_text.text = "$attemptsLeft/3"
         val json = pref?.getString("ui_msg", null)
-        println("JSON SAVE = "+ json)
+        Log.d("bkmz7692","Saved JSON = $json")
         val type: Type = object : TypeToken<ArrayList<MessageRVModal>>() {}.type
-        println("TYPE = "+type)
         messageList = if ((json != null) && (json != "")){
             gson.fromJson<Any>(json, type) as ArrayList<MessageRVModal>
         } else{
-            println("ДЕФОЛТНЫЙ СПИСОК")
+            Log.d("bkmz7692", "Default List")
             ArrayList()
         }
 
-        val temp=intent.getStringExtra("temp")
-        println("TEMP = $temp")
+        val temp= this.intent.getStringExtra("temp")
+        Log.d("bkmz7692","TEMP = $temp")
         DeepLList = ArrayList()
+        GigaChatList = ArrayList()
         messageRV.layoutManager = layoutManager
         messageRVAdapter = MessageRVAdapter(messageList)
         messageRV.adapter = messageRVAdapter
         //ВЫБОР ЯЗЫКОВ
-        val back_btn = findViewById<ImageView>(R.id.settings)
+
         back_btn.setOnClickListener{
 
             Toast.makeText(applicationContext, "Что же там?", Toast.LENGTH_SHORT).show()
+            val i = Intent(this,Settings::class.java)
+            startActivity(i)
         }
         reset_btn.setOnClickListener {
             messageList.clear()
@@ -143,6 +150,7 @@ class MainActivity : AppCompatActivity() {
             messageRV.adapter = messageRVAdapter
             msgList_FNL.clear()
             Toast.makeText(applicationContext, "История сообщений сброшена!", Toast.LENGTH_SHORT).show()
+            Saver.Save(pref!!, attemptsLeft, was_recently_seen, messageList)
         }
         val languages = resources.getStringArray(R.array.lang_array)
         val arrayAdapter = ArrayAdapter(/* context = */ this, /* resource = */ R.layout.dropdown_item, /* objects = */ languages)
@@ -153,6 +161,8 @@ class MainActivity : AppCompatActivity() {
         }
         dropMenu.visibility = View.GONE
         //КОНЕЦ ИНИЦИАЛИЗАЦИИ===================================================
+
+
         //БЛОК РЕКЛАМЫ===========================================================
         rewardedAdLoader = RewardedAdLoader(this).apply {
             setAdLoadListener(object : RewardedAdLoadListener {
@@ -171,16 +181,15 @@ class MainActivity : AppCompatActivity() {
         banner.setAdSize(BannerAdSize.fixedSize(this, 320, 90))
             val adRequest: AdRequest = Builder().build()
         banner.run {
-            println(adRequest)
             loadAd(adRequest) } }
-        println("Баннер инициализирован")
+        Log.d("bkmz7692","Баннер инициализирован")
         //КОНЕЦ БЛОКА РЕКЛАМЫ====================
 
         //КНОПКИ НАВИГАЦИИ================================
         left_btn.setOnClickListener{
 
            if (selectedNl==2) {
-                Timer().schedule(150) {
+                Timer().schedule(150) {//Влево если выбран дипл выбиракем жпт
                     selectedNl = 1
                     mode = nLinks[selectedNl]
                     runOnUiThread {
@@ -196,13 +205,14 @@ class MainActivity : AppCompatActivity() {
                         else{txtResponse.visibility = View.GONE}
                         image.visibility=View.GONE
                         txtResponse.text = "Что умеет ChatGPT: \n\n"+" 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
+
                         mainLO.animate().alpha(1f).duration = 500
                         model.animate().alpha(1f).duration = 500
                         attempts_text.animate().alpha(1f).duration = 500
                     }
                 }
             }
-            if (selectedNl ==1) {
+            if (selectedNl ==1) { //Влево Если выбран жпт то выбираем дал и
                 Timer().schedule(150) {
                     selectedNl = 0
                     mode = nLinks[selectedNl]
@@ -228,7 +238,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-            if (selectedNl == 0) {
+            if (selectedNl == 3) { //Влево, если выбран Гигачат, то выбираем Дипл
                 Timer().schedule(150) {
                     selectedNl = 2
                     mode = nLinks[selectedNl]
@@ -237,7 +247,7 @@ class MainActivity : AppCompatActivity() {
                         model.alpha = 0f
                         attempts_text.alpha = 0f
                         model.text = nLinks[selectedNl]
-                        dropMenu.visibility = View.VISIBLE
+                        dropMenu.visibility = View.GONE
                         if(isFirstDeepL){
                             txtResponse.visibility = View.VISIBLE}
                         else{txtResponse.visibility = View.GONE}
@@ -251,9 +261,32 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+            if (selectedNl == 0) { //Влево, если выбран дал-и то выбираем ГигаЧат
+                Timer().schedule(150) {
+                    selectedNl = 3
+                    mode = nLinks[selectedNl]
+                    runOnUiThread {
+                        mainLO.alpha = 0f
+                        model.alpha = 0f
+                        attempts_text.alpha = 0f
+                        model.text = nLinks[selectedNl]
+                        dropMenu.visibility = View.GONE
+                        if(isFirstGigaChat){
+                            txtResponse.visibility = View.VISIBLE}
+                        else{txtResponse.visibility = View.GONE}
+                        messageRVAdapter = MessageRVAdapter(GigaChatList)
+                        messageRV.adapter = messageRVAdapter
+                        image.visibility=View.GONE
+                        txtResponse.text = "Что умеет GigaChat: \n\n"+" 1. Писать сочинения. \n 'Напиши сочинение о конфликте поколений' \n\n 2.Объяснять что-либо.\n 'Объясни вкратце законы Ньютона' \n\n 3. Переводить на другие языки \n 'Переведи привет на Японский'"
+                        mainLO.animate().alpha(1f).duration = 500
+                        model.animate().alpha(1f).duration = 500
+                        attempts_text.animate().alpha(1f).duration = 500
+                    }
+                }
+            }
         }
         right_btn.setOnClickListener{
-            if (selectedNl==2) {
+            if (selectedNl==3) { //Кнопка вправо если выбран гигачат выбираем дал-и
                 Timer().schedule(150) {
                     selectedNl = 0
                     mode = nLinks[selectedNl]
@@ -279,7 +312,31 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-            if (selectedNl ==1) {
+            if (selectedNl==2) {
+                Timer().schedule(150) {//Кнопка вправо если выбран диип л то выбираем гигачат
+                    selectedNl = 3
+                    mode = nLinks[selectedNl]
+                    runOnUiThread {
+                        mainLO.alpha = 0f
+                        model.alpha = 0f
+                        attempts_text.alpha = 0f
+                        model.text = nLinks[selectedNl]
+                        messageRV.visibility = View.VISIBLE
+                        txtResponse.visibility = View.GONE
+                        dropMenu.visibility = View.GONE
+                        messageRVAdapter=MessageRVAdapter(GigaChatList)
+                        messageRV.adapter=messageRVAdapter
+                        if(isFirstGigaChat){txtResponse.visibility = View.VISIBLE}
+                        else{txtResponse.visibility = View.GONE}
+                        image.visibility=View.GONE
+                        txtResponse.text = "Что умеет GigaChat: \n\n" + " 1. Отвечать на вопросы. \n 'Сколько длятся сутки на марсе' \n\n 2.Прикладывать ссылки на используемые источники,\nнапример, при написании сообщения. \n\n 3. Лучше работает с российским творчеством при сочинениях '"
+                        mainLO.animate().setDuration(1000).alpha(1f)
+                        model.animate().alpha(1f).duration = 500
+                        attempts_text.animate().alpha(1f).duration = 500
+                    }
+                }
+            }
+            if (selectedNl ==1) { //Вправо, если выбран жпт то выбирам дипл
                 Timer().schedule(150) {
                     selectedNl = 2
                     mode = nLinks[selectedNl]
@@ -301,7 +358,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-            if (selectedNl == 0) {
+            if (selectedNl == 0) {// Право если выбран дипл выбираем жпт
                 Timer().schedule(150) {
                     selectedNl = 1
                     mode = nLinks[selectedNl]
@@ -330,18 +387,17 @@ class MainActivity : AppCompatActivity() {
         //Блок отправки сообщений========================
 
         etQuestion.setOnEditorActionListener(OnEditorActionListener{ textView, i, keyEvent ->
-            println(messageList)
+            Log.d("bkmz7692", messageList.toString())
             if (i==EditorInfo.IME_ACTION_SEND && !DEBUG_MODE) {
-
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
                 val question = edittextval.replace(" ", "")
                 if (attemptsLeft > 0 && connectionChecker.checkConnection(this)) {
-                    txtResponse.visibility = View.GONE
-                    messageRV.visibility = View.VISIBLE
 
+                    messageRV.visibility = View.VISIBLE
                     if (question.isNotEmpty() && question.length >= 5 && !isSended && connectionChecker.checkConnection(this)) {
                         isSended = true
                         if (mode == "ChatGPT") {
+                            txtResponse.visibility = View.GONE
                             val user_mask = """{"role": "user", "content" :"$edittextval"}"""
                             msgList_FNL.add(user_mask) //Сообщение для апи
                             messageList.add(MessageRVModal(edittextval, "user"))//Сообщение для чата
@@ -369,13 +425,46 @@ class MainActivity : AppCompatActivity() {
                             }
                             isSended = false
                         }
-                        if (mode == "DALLE-E") {//DALL E
-                            isFirstDalle = false
-                            messageRV.visibility = View.GONE
-                            Toast.makeText(applicationContext, "В разработке", Toast.LENGTH_SHORT).show()
+                        if (mode == "GigaChat") {
+                            Toast.makeText(applicationContext, "Мы работаем над интеграцией", Toast.LENGTH_SHORT).show()
+                            isSended = false
+                            /*val user_mask = """{"role": "user", "content" :"$edittextval"}"""
+                            SberList_FNL.add(user_mask) //Сообщение для апи
+                            GigaChatList.add(MessageRVModal(edittextval, "user"))//Сообщение для чата
+                            messageRVAdapter.notifyDataSetChanged()
+                            isFirstGigaChat = false
+                            etQuestion.setText("")
+                            GigaChatList.add(MessageRVModal("Печатает...", "bot"))
+                            messageRV.smoothScrollToPosition(messageRVAdapter.itemCount)
+                            //Отправляем строку в функцию
+                            NeiroApi(attemptsLeft).getResponse(question, client, msgList_FNL, mode, url_api, apiKey,selectedLang) { response ->
+                                runOnUiThread {
+                                    messageRV.visibility = View.VISIBLE
+                                    GigaChatList.removeLast()
+                                    val response_to_list = response.replace("\n", "").replace("\"", "'")
+                                    GigaChatList.add(MessageRVModal(response, "bot"))
+                                    messageRVAdapter.run { notifyDataSetChanged() }
+                                    messageRV.smoothScrollToPosition(messageRVAdapter.itemCount)
+                                    val nl_mask = """{"role": "assistant", "content" :"$response_to_list"}"""
+                                    SberList_FNL.add(nl_mask)
+                                    attemptsLeft -= 1
+                                    attempts_text.text = "$attemptsLeft/3"
+                                    Saver.Save(pref!!, attemptsLeft, was_recently_seen, messageList)
+                                }
+                                //КОНЕЦ UI ПОТОКА
+                            }
+                            isSended = false*/
+                        }
 
+                        if (mode == "DALLE-E") {//DALL E
+                            //isFirstDalle = false
+                            messageRV.visibility = View.GONE
+                            Toast.makeText(applicationContext, "В данный момент функция находится на стадии тестирования", Toast.LENGTH_SHORT).show()
+                            txtResponse.visibility = View.VISIBLE
+                            isSended = false
                         }
                         if (mode == "DeepL" && isLangSelected) {
+
                             txtResponse.visibility = View.GONE
                             isFirstDeepL = false
                             messageRV.visibility = View.VISIBLE
@@ -392,6 +481,7 @@ class MainActivity : AppCompatActivity() {
                                     messageRVAdapter.notifyDataSetChanged()
                                 }
                             }
+                            isSended = false
                         }
                         if(!isLangSelected && mode=="DeepL"){ Toast.makeText(applicationContext, "Вы не выбрали язык", Toast.LENGTH_SHORT).show() }
 
@@ -412,11 +502,12 @@ class MainActivity : AppCompatActivity() {
             val adRequestConfiguration = AdRequestConfiguration.Builder(reward_ad_id).build()
             rewardedAdLoader?.loadAd(adRequestConfiguration)
         }
+
        private fun showAd() {
            rewardedAd?.apply {
                setAdEventListener(object : RewardedAdEventListener {
                    override fun onAdShown() {
-                       println("AD SHOWn")
+                       Log.d("bkmz7692","Ad Shown")
                    }
                    override fun onAdFailedToShow(adError: AdError) {
                        runOnUiThread { Toast.makeText(

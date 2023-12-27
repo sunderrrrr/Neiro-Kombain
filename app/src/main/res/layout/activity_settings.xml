@@ -13,6 +13,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingStart="15sp"
+        android:paddingEnd="15sp"
         tools:context=".Settings">
 
         <RadioGroup
@@ -31,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingBottom="20sp"
-                android:text="Параметры ChatGPT"
+                android:text="Параметры ChatGPT\n(В разработке)"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -41,6 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Температура: 1"
+                android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
             <TextView
@@ -48,6 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Параметр, который определяет степень допуска к «творчеству» для этой нейронной сети. Его можно регулировать в диапазоне от 0 до 1, где: 0 – это запрет на вариативность; 1 – предоставление широкого доступа искусственного интеллекта к творчеству."
+                android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
             <SeekBar
@@ -55,14 +59,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="50sp"
                 android:max="10"
-                android:progress="0"
-                />
+                android:progress="0" />
 
             <TextView
                 android:id="@+id/temp_val2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Креативность: 1"
+                android:textColor="#FFFFFF"
                 android:textSize="20sp" />
 
             <TextView
@@ -70,6 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Чем выше значение, тем более вероятно, что ChatGPT начнет говорить на новые темы."
+                android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
             <SeekBar
@@ -115,7 +120,7 @@
 
 
             <AutoCompleteTextView
-                android:id="@+id/lang"
+                android:id="@+id/SettingsLangTV"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#121212"
