@@ -90,6 +90,7 @@ class MainActivity : AppCompatActivity() {
     val Saver = SaveData()
     private val gson = Gson()
     private lateinit var appUpdateManager: AppUpdateManager
+    var isSecondDalleAd = false
 
     @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
 
@@ -178,7 +179,7 @@ class MainActivity : AppCompatActivity() {
         MobileInstreamAds.setAdGroupPreloading(true)
         MobileAds.enableLogging(true)
         banner.setAdUnitId(banner_ad_id)// BANER
-        banner.setAdSize(BannerAdSize.fixedSize(this, 320, 90))
+        banner.setAdSize(BannerAdSize.fixedSize(this, 320, 70))
             val adRequest: AdRequest = Builder().build()
         banner.run {
             loadAd(adRequest) } }

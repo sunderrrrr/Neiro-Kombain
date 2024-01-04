@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000C0C0C"
+    android:background="#0C0C0C"
     android:backgroundTintMode="screen"
     tools:context=".MainActivity">
 
@@ -12,7 +12,7 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="439dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="180dp"
         android:background="#000C0C0C"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="5sp"
@@ -22,8 +22,10 @@
         android:verticalScrollbarPosition="right"
         app:layout_constraintBottom_toTopOf="@id/banner"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.51">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/dropMenu"
@@ -122,7 +124,7 @@
         android:id="@+id/linearLayout2"
         android:layout_width="319dp"
         android:layout_height="52dp"
-        android:layout_marginTop="70sp"
+        android:layout_marginTop="60dp"
         android:background="#00FFFFFF"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@id/attemts"
@@ -170,8 +172,8 @@
         android:id="@+id/attemts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20sp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
         android:background="#00FFFFFF"
         android:fontFamily="sans-serif-light"
         android:paddingTop="5sp"
@@ -192,7 +194,7 @@
         android:layout_width="346dp"
         android:layout_height="61dp"
 
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="60dp"
         android:background="@drawable/corner"
         android:ems="10"
         android:fontFamily="sans-serif-light"
@@ -205,7 +207,6 @@
         android:textColorHint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/banner"
         app:layout_constraintVertical_bias="0.65999997"
@@ -213,18 +214,18 @@
 
     <ImageView
         android:id="@+id/settings"
-        android:layout_width="127dp"
+        android:layout_width="wrap_content"
         android:layout_height="39dp"
         android:layout_marginStart="292dp"
         android:layout_marginEnd="20sp"
         android:background="#00FFFFFF"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.285"
+        app:layout_constraintHorizontal_bias="0.826"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.516"
-        app:srcCompat="@drawable/settings" />
+        app:srcCompat="@drawable/settings24px" />
 
     <ImageButton
         android:id="@+id/reset_msg"
@@ -234,10 +235,10 @@
         android:background="#00FFFFFF"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toStartOf="@+id/settings"
-        app:layout_constraintHorizontal_bias="0.673"
+        app:layout_constraintHorizontal_bias="0.226"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintVertical_bias="0.568"
         app:srcCompat="@drawable/reload" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,7 +4,7 @@
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
         <item name="colorPrimary">#7034FF</item>
-        <item name="android:background">#0C0C0C</item>
+
         <item name="android:statusBarColor">#0C0C0C</item>
         <item name="android:windowIsTranslucent">true</item>
 

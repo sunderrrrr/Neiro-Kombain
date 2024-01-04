@@ -7,12 +7,14 @@
     android:layout_height="match_parent"
 
 
+    android:background="#0C0C0C"
     android:scrollbarSize="2dp"
     android:scrollbarThumbVertical="@color/design_default_color_primary">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#0C0C0C"
         android:paddingStart="15sp"
         android:paddingEnd="15sp"
         tools:context=".Settings">
