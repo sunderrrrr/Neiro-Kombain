@@ -12,8 +12,8 @@ android {
         applicationId = "com.bkmzdev.neirocombain"
         minSdk = 26
         targetSdk = 33
-        versionCode = 9
-        versionName = "1.1.5"
+        versionCode = 13
+        versionName = "1.1.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation("io.appmetrica.analytics:analytics:6.1.0")
     implementation("com.google.code.gson:gson:2.8.5")
     implementation("com.squareup.picasso:picasso:2.5.2")
     implementation("com.github.bumptech.glide:glide:4.16.0")

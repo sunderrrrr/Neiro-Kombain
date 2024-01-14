@@ -8,6 +8,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.devicelock.DeviceId
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -45,8 +46,11 @@ import com.yandex.mobile.ads.rewarded.RewardedAd
 import com.yandex.mobile.ads.rewarded.RewardedAdEventListener
 import com.yandex.mobile.ads.rewarded.RewardedAdLoadListener
 import com.yandex.mobile.ads.rewarded.RewardedAdLoader
+import io.appmetrica.analytics.AppMetrica
+import io.appmetrica.analytics.AppMetricaConfig
 import okhttp3.OkHttpClient
 import java.lang.reflect.Type
+import java.util.Base64
 import java.util.Timer
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
@@ -55,7 +59,10 @@ import kotlin.concurrent.schedule
 class MainActivity : AppCompatActivity() {
     private var DEBUG_MODE = false//ВЫКЛ ВКЛ ДЕБАГ
     private val url_api = "https://api.proxyapi.ru/openai/" // v1/chat/completions
-    private val apiKey = "sk-PumVBSKFnaHTR2u5QfK3qopF3sDxOBsr"
+    val encodedString = "c2stZ1A1QkxQTjlYWWprM1Uya0QxemRrOHU1a3dBczVFNUQ="
+    val decodedBytes = Base64.getDecoder().decode(encodedString)
+    val decodedString = String(decodedBytes, Charsets.UTF_8)
+    private val apiKey = decodedString
     private val reward_ad_id = "R-M-4312016-3"
     private val banner_ad_id = "R-M-4312016-1"
     private lateinit var txtResponse: TextView
@@ -101,6 +108,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
         Updater(appUpdateManager).checlForUpdates(this)//Проверка обновлений
+        val config = AppMetricaConfig.newConfigBuilder("e4d92f2a-fcc2-463c-9364-5b7e7a05a839").build()
+
+        AppMetrica.activate(this, config)
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
         val model = findViewById<TextView>(R.id.model)
@@ -117,7 +127,7 @@ class MainActivity : AppCompatActivity() {
         txtResponse=findViewById(R.id.desc)
         attempts_text = findViewById(R.id.attemts)
         messageRV = findViewById(R.id.msgRV)
-        attemptsLeft = pref?.getInt("attempts", 3)!!
+        attemptsLeft = pref?.getInt("attempts", 2)!!
         attempts_text.text = "$attemptsLeft/3"
         val json = pref?.getString("ui_msg", null)
         Log.d("bkmz7692","Saved JSON = $json")
@@ -526,7 +536,7 @@ class MainActivity : AppCompatActivity() {
                    @SuppressLint("SetTextI18n")
                    override fun onRewarded(reward: Reward) {
                        // Called when the user can be rewarded.
-                       attemptsLeft = 3
+                       attemptsLeft = 2
                        attempts_text.text = "$attemptsLeft/3"
                        Saver.Save(pref!!, attemptsLeft, was_recently_seen, messageList)
                    }

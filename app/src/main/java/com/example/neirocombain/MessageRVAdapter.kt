@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.neirocombain.R
 
 class MessageRVAdapter(private val messageList: ArrayList<MessageRVModal>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -18,11 +17,11 @@ class MessageRVAdapter(private val messageList: ArrayList<MessageRVModal>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val view: View
         return if (viewType==0) {
-                view = LayoutInflater.from(parent.context).inflate(R.layout.user_item,parent,false)
+                view = LayoutInflater.from(parent.context).inflate(R.layout.useritem,parent,false)
                 UserMessageViewHolder(view)
         }
         else{
-            view = LayoutInflater.from(parent.context).inflate(R.layout.bot_item,parent,false)
+            view = LayoutInflater.from(parent.context).inflate(R.layout.botitem,parent,false)
             BotMessageViewHolder(view)
         }
     }

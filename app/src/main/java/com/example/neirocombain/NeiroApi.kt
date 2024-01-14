@@ -25,7 +25,8 @@ class NeiroApi(var attemptsLeft: Int) {
             val requestBody = """
             {
                 "model": "gpt-3.5-turbo-1106",
-                "messages": [$msg_req]     
+                "messages": [$msg_req],
+                "max_tokens": 1000
             }
             """.trimIndent()
             println("REQUESRT BODY$requestBody")
@@ -58,6 +59,7 @@ class NeiroApi(var attemptsLeft: Int) {
                     } catch (e: JSONException) {
                         println(body)
                         attemptsLeft += 1
+                        callback("Произошла ошибка, возможно она на стороне сервера. Проверьте соединение с интернетом или попробуйте обновить приложение в магазине")
                     }
                 }
             })
