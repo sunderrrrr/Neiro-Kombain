@@ -8,7 +8,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.devicelock.DeviceId
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -93,6 +92,7 @@ class MainActivity : AppCompatActivity() {
     private var isFirstDeepL = true
     private var isFirstDalle = true
     private var isFirstGigaChat = true
+    var firstDallEAd = true
     var pref: SharedPreferences? = null
     val Saver = SaveData()
     private val gson = Gson()
@@ -109,7 +109,6 @@ class MainActivity : AppCompatActivity() {
         appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
         Updater(appUpdateManager).checlForUpdates(this)//Проверка обновлений
         val config = AppMetricaConfig.newConfigBuilder("e4d92f2a-fcc2-463c-9364-5b7e7a05a839").build()
-
         AppMetrica.activate(this, config)
         val left_btn = findViewById<ImageView>(R.id.leftarr)
         val right_btn = findViewById<ImageView>(R.id.rightarr)
@@ -127,7 +126,7 @@ class MainActivity : AppCompatActivity() {
         txtResponse=findViewById(R.id.desc)
         attempts_text = findViewById(R.id.attemts)
         messageRV = findViewById(R.id.msgRV)
-        attemptsLeft = pref?.getInt("attempts", 2)!!
+        attemptsLeft = pref?.getInt("attempts", 4)!!
         attempts_text.text = "$attemptsLeft/3"
         val json = pref?.getString("ui_msg", null)
         Log.d("bkmz7692","Saved JSON = $json")
@@ -398,6 +397,7 @@ class MainActivity : AppCompatActivity() {
         //Блок отправки сообщений========================
 
         etQuestion.setOnEditorActionListener(OnEditorActionListener{ textView, i, keyEvent ->
+
             Log.d("bkmz7692", messageList.toString())
             if (i==EditorInfo.IME_ACTION_SEND && !DEBUG_MODE) {
                 edittextval = etQuestion.text.toString().trim().replaceFirstChar { it.uppercase() }
@@ -431,6 +431,7 @@ class MainActivity : AppCompatActivity() {
                                     attemptsLeft -= 1
                                     attempts_text.text = "$attemptsLeft/3"
                                     Saver.Save(pref!!, attemptsLeft, was_recently_seen, messageList)
+                                    Log.d("bkmz7692", "MsgFnl $msgList_FNL")
                                 }
                                 //КОНЕЦ UI ПОТОКА
                             }
@@ -470,7 +471,7 @@ class MainActivity : AppCompatActivity() {
                         if (mode == "DALLE-E") {//DALL E
                             //isFirstDalle = false
                             messageRV.visibility = View.GONE
-                            Toast.makeText(applicationContext, "В данный момент функция находится на стадии тестирования", Toast.LENGTH_SHORT).show()
+                            showAd()
                             txtResponse.visibility = View.VISIBLE
                             isSended = false
                         }
@@ -498,13 +499,22 @@ class MainActivity : AppCompatActivity() {
 
                     } else if (isSended) { Toast.makeText(applicationContext, "Вы уже отправили запрос! Дождитесь ответа", Toast.LENGTH_SHORT).show() }
                 }
+                if(msgList_FNL.toString().length.toInt() >= 2000){
+                    val tmp_len = msgList_FNL.toString().length
+                    msgList_FNL.clear()
+                    Log.d("bkmz7692","При длине $tmp_len список был очищен $msgList_FNL" )
+                }
                 if (attemptsLeft == 0 && connectionChecker.checkConnection(this)) {
                     Toast.makeText(applicationContext, "Количество запросов исчерпано. После воспроизведения рекламы они восстановятся", Toast.LENGTH_SHORT).show()
-                    showAd() } }
+                    showAd() }
+
+            }
+
             when {
                 !connectionChecker.checkConnection(this) -> { Toast.makeText(applicationContext, "Проверьте соединение с интернетом", Toast.LENGTH_SHORT).show() }
             }
             if (DEBUG_MODE){ Toast.makeText(applicationContext, "Эта версия предназначена для проверки дизайна и не имеет функционала", Toast.LENGTH_SHORT).show() }
+
         false
         })
     }
@@ -536,9 +546,14 @@ class MainActivity : AppCompatActivity() {
                    @SuppressLint("SetTextI18n")
                    override fun onRewarded(reward: Reward) {
                        // Called when the user can be rewarded.
-                       attemptsLeft = 2
+                       attemptsLeft = 4
                        attempts_text.text = "$attemptsLeft/3"
+                       if (mode=="Dalee-E" && firstDallEAd){
+                           showAd()
+                       }
+                       firstDallEAd = false
                        Saver.Save(pref!!, attemptsLeft, was_recently_seen, messageList)
+                       firstDallEAd = true
                    }
                })
                show(this@MainActivity)
