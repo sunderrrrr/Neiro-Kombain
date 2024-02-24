@@ -1,7 +1,7 @@
 
 # Neiro/Kombain 
 
-Client for openAI neural networks by working via api
+Client for openAI neural networks by working via api(my first app)
 
 
 ## Stack
