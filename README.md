@@ -1,7 +1,18 @@
+
 # Neiro/Kombain 
 
 Client for openAI neural networks by working via api
 
+
+## Stack
+
+**Program Language:** kotlin
+
+**IDE:** Android Studio Hedgehog
+
+**UI:** Made by XML
+
+**Architecture:** All in one file
 
 ## Screenshots
 
